@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import "./globals.css";
+import Footer from "./components/Footer";
 
 function MoonIcon() {
   return (
@@ -84,6 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
 
         <div>{children}</div>
+        <Footer />
       </body>
     </html>
   );
