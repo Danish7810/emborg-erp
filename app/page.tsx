@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { useState } from "react";
 import useScrollReveal from "./hooks/useScrollReveal";
 import ModulesInfographic from "./components/ModulesInfographic";
@@ -17,8 +17,8 @@ export default function Home() {
           <h1 className="tight" style={{ fontSize: "56px", fontWeight: 700, color: "var(--ink)", lineHeight: 1.05, margin: 0 }}>Run your entire business in one system.</h1>
           <p style={{ fontSize: "19px", marginTop: "24px", color: "var(--muted)", maxWidth: "480px", lineHeight: 1.5 }}>EMBORG brings finance, inventory, CRM, HR, sales, and projects together, so nothing falls through the cracks.</p>
           <div style={{ marginTop: "36px", display: "flex", gap: "14px" }}>
-            <a href="/contact" style={{ padding: "13px 26px", backgroundColor: "var(--accent)", color: "white", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Request a demo</a>
-            <a href="/features" style={{ padding: "13px 26px", backgroundColor: "transparent", color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Explore features</a>
+            <a href="/contact" className="btn-primary" style={{ padding: "13px 26px", backgroundColor: "var(--accent)", color: "white", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Request a demo</a>
+            <a href="/features" className="btn-secondary" style={{ padding: "13px 26px", backgroundColor: "transparent", color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Explore features</a>
           </div>
         </div>
 
@@ -53,7 +53,7 @@ export default function Home() {
             <button
               key={m.id}
               onClick={() => { setSelectedId(m.id); document.getElementById("module-detail-anchor")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}
-              className="fade-up"
+              className="fade-up card-interactive"
               style={{ padding: "24px", border: selectedId === m.id ? "2px solid var(--accent)" : "1px solid var(--line)", borderRadius: "14px", backgroundColor: "var(--bg)", textAlign: "left", cursor: "pointer", font: "inherit" }}
             >
               <h3 style={{ color: "var(--ink)", margin: "0 0 8px 0", fontSize: "17px" }}>{m.name}</h3>
@@ -66,9 +66,8 @@ export default function Home() {
       <section style={{ padding: "80px 40px", textAlign: "center" }} className="fade-up">
         <h2 className="tight" style={{ fontSize: "30px", fontWeight: 700, color: "var(--ink)", margin: "0 0 14px 0" }}>See EMBORG on your own data.</h2>
         <p style={{ fontSize: "16px", color: "var(--muted)", margin: "0 0 28px 0" }}>Book a short walkthrough with our team, no commitment required.</p>
-        <a href="/contact" style={{ padding: "13px 28px", backgroundColor: "var(--accent)", color: "white", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Request a demo</a>
+        <a href="/contact" className="btn-primary" style={{ padding: "13px 28px", backgroundColor: "var(--accent)", color: "white", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Request a demo</a>
       </section>
     </main>
   );
 }
-

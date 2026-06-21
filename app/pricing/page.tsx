@@ -17,10 +17,10 @@ export default function Pricing() {
         <p style={{ fontSize: "17px", color: "var(--muted)", marginTop: "18px", lineHeight: 1.5 }}>No hidden fees. Cancel anytime. Switch plans as you grow.</p>
       </section>
 
-      <section style={{ padding: "60px 40px 100px" }}>
+      <section style={{ padding: "60px 40px 30px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "20px", maxWidth: "960px", margin: "0 auto" }}>
           {plans.map((plan, i) => (
-            <div key={i} className="fade-up" style={{ padding: "32px", backgroundColor: plan.highlight ? "var(--ink)" : "var(--bg-alt)", border: plan.highlight ? "none" : "1px solid var(--line)", borderRadius: "18px", textAlign: "center" }}>
+            <div key={i} className="fade-up card-interactive" style={{ padding: "32px", backgroundColor: plan.highlight ? "var(--ink)" : "var(--bg-alt)", border: plan.highlight ? "none" : "1px solid var(--line)", borderRadius: "18px", textAlign: "center" }}>
               {plan.highlight && (
                 <div style={{ display: "inline-block", padding: "4px 12px", backgroundColor: "var(--accent)", color: "white", borderRadius: "12px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "16px" }}>Most popular</div>
               )}
@@ -30,9 +30,19 @@ export default function Pricing() {
                 <span style={{ fontSize: "15px", color: plan.highlight ? "rgba(255,255,255,0.6)" : "var(--muted)" }}>{plan.period}</span>
               </div>
               <p style={{ color: plan.highlight ? "rgba(255,255,255,0.75)" : "var(--muted)", fontSize: "14px", margin: "0 0 22px 0" }}>{plan.desc}</p>
-              <a href="/contact" style={{ display: "inline-block", padding: "11px 24px", backgroundColor: plan.highlight ? "white" : "var(--accent)", color: plan.highlight ? "var(--ink)" : "white", borderRadius: "20px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Get started</a>
+              <a href="/contact" className="btn-primary" style={{ display: "inline-block", padding: "11px 24px", backgroundColor: plan.highlight ? "white" : "var(--accent)", color: plan.highlight ? "var(--ink)" : "white", borderRadius: "20px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Get started</a>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section style={{ padding: "20px 40px 100px", textAlign: "center" }} className="fade-up">
+        <p style={{ fontSize: "13px", color: "var(--muted)", marginBottom: "14px" }}>Secure payments accepted via</p>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "8px", padding: "8px 14px" }}>Visa</span>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "8px", padding: "8px 14px" }}>Mastercard</span>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "8px", padding: "8px 14px" }}>UPI</span>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "8px", padding: "8px 14px" }}>Net Banking</span>
         </div>
       </section>
     </main>

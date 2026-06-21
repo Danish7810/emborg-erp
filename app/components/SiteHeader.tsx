@@ -48,14 +48,14 @@ export default function SiteHeader({ children }: { children: React.ReactNode }) 
           </a>
 
           <nav className="nav-links">
-            <a href="/" style={{ textDecoration: "none", color: "var(--muted)", fontSize: "14px" }}>Home</a>
-            <a href="/features" style={{ textDecoration: "none", color: "var(--muted)", fontSize: "14px" }}>Features</a>
-            <a href="/pricing" style={{ textDecoration: "none", color: "var(--muted)", fontSize: "14px" }}>Pricing</a>
-            <a href="/contact" style={{ textDecoration: "none", color: "var(--muted)", fontSize: "14px" }}>Contact</a>
+            <a href="/" className="link-hover" style={{ textDecoration: "none", color: "var(--muted)", fontSize: "14px" }}>Home</a>
+            <a href="/features" className="link-hover" style={{ textDecoration: "none", color: "var(--muted)", fontSize: "14px" }}>Features</a>
+            <a href="/pricing" className="link-hover" style={{ textDecoration: "none", color: "var(--muted)", fontSize: "14px" }}>Pricing</a>
+            <a href="/contact" className="link-hover" style={{ textDecoration: "none", color: "var(--muted)", fontSize: "14px" }}>Contact</a>
             <button onClick={toggleTheme} className="theme-toggle" aria-label="Toggle dark mode">
               {dark ? <MoonIcon /> : <SunIcon />}
             </button>
-            <a href="/contact" style={{ backgroundColor: "var(--accent)", color: "white", padding: "9px 18px", borderRadius: "20px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>Request Demo</a>
+            <a href="/contact" className="btn-primary" style={{ backgroundColor: "var(--accent)", color: "white", padding: "9px 18px", borderRadius: "20px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>Request Demo</a>
           </nav>
 
           <button onClick={() => setOpen(!open)} className="nav-toggle" aria-label="Toggle menu" aria-expanded={open} style={{ background: "none", border: "none", padding: "6px", cursor: "pointer" }}>

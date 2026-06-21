@@ -22,7 +22,7 @@ export default function Features() {
             <button
               key={m.id}
               onClick={() => { setSelectedId(m.id); document.getElementById("feature-detail-anchor")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}
-              className="fade-up"
+              className="fade-up card-interactive"
               style={{ padding: "28px", border: selectedId === m.id ? "2px solid var(--accent)" : "1px solid var(--line)", borderRadius: "16px", backgroundColor: "var(--bg-alt)", textAlign: "left", cursor: "pointer", font: "inherit" }}
             >
               <h3 style={{ color: "var(--ink)", margin: "0 0 10px 0", fontSize: "18px" }}>{m.name}</h3>
@@ -38,7 +38,7 @@ export default function Features() {
       </section>
 
       <section style={{ padding: "0 40px 100px", textAlign: "center" }} className="fade-up">
-        <a href="/contact" style={{ padding: "13px 28px", backgroundColor: "var(--accent)", color: "white", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Request a demo</a>
+        <a href="/contact" className="btn-primary" style={{ padding: "13px 28px", backgroundColor: "var(--accent)", color: "white", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Request a demo</a>
       </section>
     </main>
   );
