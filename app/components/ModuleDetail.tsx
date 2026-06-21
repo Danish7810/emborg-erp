@@ -22,14 +22,9 @@ export default function ModuleDetail({ module }: { module: Module | null }) {
         {module.outcome}
       </p>
 
-      <div style={{ padding: "18px", backgroundColor: "var(--bg-alt)", borderRadius: "12px", marginBottom: "20px" }}>
+      <div style={{ padding: "18px", backgroundColor: "var(--bg-alt)", borderRadius: "12px" }}>
         <p style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: "var(--muted)", margin: "0 0 8px 0" }}>Real-world impact</p>
         <p style={{ fontSize: "14px", color: "var(--ink)", margin: 0, lineHeight: 1.6 }}>{module.story}</p>
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
-        <p style={{ fontSize: "14px", color: "var(--muted)", margin: 0 }}>Have more questions about {module.name.toLowerCase()}?</p>
-        <a href="/contact" style={{ padding: "10px 20px", backgroundColor: "var(--accent)", color: "white", borderRadius: "20px", textDecoration: "none", fontWeight: 600, fontSize: "13px", whiteSpace: "nowrap" }}>Request a demo</a>
       </div>
     </div>
   );
