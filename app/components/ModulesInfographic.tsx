@@ -21,7 +21,7 @@ export default function ModulesInfographic({ onSelect, selectedId }: { onSelect:
       </defs>
 
       {modules.map((m) => (
-        <path key={m.id} d={positions[m.id].path} fill="none" stroke={selectedId === m.id ? "#2563EB" : "#D4D4D1"} strokeWidth={selectedId === m.id ? 2.5 : 2} style={{ transition: "stroke 0.3s" }} />
+        <path key={m.id} d={positions[m.id].path} fill="none" stroke={selectedId === m.id ? "var(--accent)" : "var(--line)"} strokeWidth={selectedId === m.id ? 2.5 : 2} style={{ transition: "stroke 0.3s" }} />
       ))}
 
       {modules.map((m) => {
@@ -37,9 +37,9 @@ export default function ModulesInfographic({ onSelect, selectedId }: { onSelect:
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelect(m.id); }}
             style={{ cursor: "pointer", outline: "none" }}
           >
-            <rect x={pos.x - 80} y={pos.y - 34} width="160" height="68" rx="14" fill={active ? "#EFF4FF" : "#FFFFFF"} stroke={active ? "#2563EB" : "#E5E5E0"} strokeWidth={active ? 2 : 1} />
-            <text x={pos.x} y={pos.y - 4} textAnchor="middle" fontFamily="-apple-system, sans-serif" fontSize="14" fontWeight="700" fill="#0A0A0A">{m.name.split(" ")[0]}</text>
-            <text x={pos.x} y={pos.y + 16} textAnchor="middle" fontFamily="-apple-system, sans-serif" fontSize="10.5" fill="#71717A">Click to explore</text>
+            <rect x={pos.x - 80} y={pos.y - 34} width="160" height="68" rx="14" fill={active ? "var(--bg-alt)" : "var(--bg)"} stroke={active ? "var(--accent)" : "var(--line)"} strokeWidth={active ? 2 : 1} />
+            <text x={pos.x} y={pos.y - 4} textAnchor="middle" fontFamily="-apple-system, sans-serif" fontSize="14" fontWeight="700" fill="var(--ink)">{m.name.split(" ")[0]}</text>
+            <text x={pos.x} y={pos.y + 16} textAnchor="middle" fontFamily="-apple-system, sans-serif" fontSize="10.5" fill="var(--muted)">Click to explore</text>
           </g>
         );
       })}
