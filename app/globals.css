@@ -40,6 +40,36 @@ body {
   transform: translateY(0);
 }
 
+.nav-links {
+  display: flex;
+  gap: 28px;
+}
+
+.nav-toggle {
+  display: none;
+}
+
+.nav-mobile-panel {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+  .nav-toggle {
+    display: block;
+  }
+  .nav-mobile-panel.open {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 24px 20px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fade-up {
     opacity: 1;

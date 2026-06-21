@@ -1,41 +1,32 @@
+"use client";
+import useScrollReveal from "../hooks/useScrollReveal";
+import { modules } from "../data";
+
 export default function Features() {
-  const modules = [
-    { title: "Inventory Management", desc: "Track stock, warehouses, and product flow in real-time." },
-    { title: "Accounting and Finance", desc: "Manage invoices, expenses, and financial reports." },
-    { title: "CRM", desc: "Track leads, customers, and sales pipelines." },
-    { title: "HR and Payroll", desc: "Manage employees, salaries, and attendance." },
-    { title: "Sales Management", desc: "Monitor sales performance and orders." },
-    { title: "Project Management", desc: "Plan and track projects and tasks efficiently." }
-  ];
+  useScrollReveal();
 
   return (
-    <main style={{ padding: "80px 20px", fontFamily: "Arial" }}>
-      <h1 style={{ textAlign: "center", fontSize: "36px", color: "#0f172a", marginBottom: "10px" }}>
-        EMBORG Features
-      </h1>
-      <p style={{ textAlign: "center", color: "#64748b", marginBottom: "50px" }}>
-        Everything your business needs, in one platform.
-      </p>
+    <main>
+      <section style={{ padding: "100px 40px 20px", maxWidth: "800px", margin: "0 auto", textAlign: "center" }} className="fade-up">
+        <h1 className="tight" style={{ fontSize: "44px", fontWeight: 700, color: "var(--ink)", margin: 0, lineHeight: 1.1 }}>Everything your business needs, in one platform.</h1>
+        <p style={{ fontSize: "17px", color: "var(--muted)", marginTop: "18px", lineHeight: 1.5 }}>Six modules. One login. No spreadsheets stitched together at midnight.</p>
+      </section>
 
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-        gap: "20px",
-        maxWidth: "1000px",
-        margin: "0 auto"
-      }}>
-        {modules.map((m, i) => (
-          <div key={i} style={{
-            padding: "25px",
-            border: "1px solid #e2e8f0",
-            borderRadius: "12px",
-            backgroundColor: "#f8fafc"
-          }}>
-            <h3 style={{ color: "#0f172a", marginBottom: "8px" }}>{m.title}</h3>
-            <p style={{ color: "#64748b", fontSize: "14px" }}>{m.desc}</p>
-          </div>
-        ))}
-      </div>
+      <section style={{ padding: "60px 40px 100px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "20px", maxWidth: "1000px", margin: "0 auto" }}>
+          {modules.map((m) => (
+            <div key={m.id} className="fade-up" style={{ padding: "28px", border: "1px solid var(--line)", borderRadius: "16px", backgroundColor: "var(--bg-alt)" }}>
+              <h3 style={{ color: "var(--ink)", margin: "0 0 10px 0", fontSize: "18px" }}>{m.name}</h3>
+              <p style={{ fontSize: "14px", color: "var(--muted)", margin: "0 0 8px 0", lineHeight: 1.5 }}>{m.problem}</p>
+              <p style={{ fontSize: "14px", color: "var(--accent)", margin: 0, fontWeight: 600 }}>{m.outcome}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={{ padding: "0 40px 100px", textAlign: "center" }} className="fade-up">
+        <a href="/contact" style={{ padding: "13px 28px", backgroundColor: "var(--accent)", color: "white", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Request a demo</a>
+      </section>
     </main>
   );
 }
