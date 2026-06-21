@@ -4,11 +4,11 @@ import { useState } from "react";
 export default function Contact() {
   const [status, setStatus] = useState("idle");
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("sending");
 
-    const form = e.target;
+    const form = e.currentTarget;
     const data = new FormData(form);
 
     try {
