@@ -48,7 +48,7 @@ export default function InventoryPage() {
       if (!profile?.company_id) { setSaving(false); return; }
       await supabase.from("inventory").insert({ ...payload, company_id: profile.company_id });
     }
-    setShowForm(false);
+    console.log("Save result:", JSON.stringify(payload)); setShowForm(false);
     setSaving(false);
     fetchItems();
   }
@@ -138,3 +138,4 @@ export default function InventoryPage() {
     </div>
   );
 }
+
