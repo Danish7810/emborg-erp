@@ -18,6 +18,7 @@ export default function InventoryPage() {
   const [price, setPrice] = useState("0");
   const [lowStock, setLowStock] = useState("10");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   async function fetchItems() {
     const supabase = createClient();
@@ -31,24 +32,27 @@ export default function InventoryPage() {
   const filtered = items.filter((i) => i.name?.toLowerCase().includes(search.toLowerCase()) || i.sku?.toLowerCase().includes(search.toLowerCase()) || i.category?.toLowerCase().includes(search.toLowerCase()));
   const lowStockItems = items.filter((i) => i.quantity <= i.low_stock_alert);
 
-  function openAdd() { setEditing(null); setName(""); setSku(""); setCategory(""); setQuantity("0"); setUnit("pcs"); setPrice("0"); setLowStock("10"); setShowForm(true); }
-  function openEdit(item: Item) { setEditing(item); setName(item.name); setSku(item.sku || ""); setCategory(item.category || ""); setQuantity(String(item.quantity)); setUnit(item.unit || "pcs"); setPrice(String(item.price)); setLowStock(String(item.low_stock_alert)); setShowForm(true); }
+  function openAdd() { setEditing(null); setName(""); setSku(""); setCategory(""); setQuantity("0"); setUnit("pcs"); setPrice("0"); setLowStock("10"); setError(""); setShowForm(true); }
+  function openEdit(item: Item) { setEditing(item); setName(item.name); setSku(item.sku || ""); setCategory(item.category || ""); setQuantity(String(item.quantity)); setUnit(item.unit || "pcs"); setPrice(String(item.price)); setLowStock(String(item.low_stock_alert)); setError(""); setShowForm(true); }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    setError("");
     const supabase = createClient();
     const payload = { name, sku, category, quantity: parseInt(quantity) || 0, unit, price: parseFloat(price) || 0, low_stock_alert: parseInt(lowStock) || 10 };
+
     if (editing) {
-      await supabase.from("inventory").update(payload).eq("id", editing.id);
+      const { error: err } = await supabase.from("inventory").update(payload).eq("id", editing.id);
+      if (err) { setError(err.message); setSaving(false); return; }
     } else {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setSaving(false); return; }
-      const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", user.id).single();
-      if (!profile?.company_id) { setSaving(false); return; }
-      await supabase.from("inventory").insert({ ...payload, company_id: profile.company_id });
+      const { data: companyData, error: fnError } = await supabase.rpc("get_my_company_id");
+      if (fnError || !companyData) { setError("Could not get company: " + (fnError?.message || "no company found")); setSaving(false); return; }
+      const { error: insertError } = await supabase.from("inventory").insert({ ...payload, company_id: companyData });
+      if (insertError) { setError(insertError.message); setSaving(false); return; }
     }
-    console.log("Save result:", JSON.stringify(payload)); setShowForm(false);
+
+    setShowForm(false);
     setSaving(false);
     fetchItems();
   }
@@ -88,6 +92,7 @@ export default function InventoryPage() {
           <input placeholder="Quantity" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} style={{ padding: "10px 12px", border: "1px solid var(--line)", borderRadius: "8px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "14px" }} />
           <input placeholder="Price ($)" type="number" value={price} onChange={(e) => setPrice(e.target.value)} style={{ padding: "10px 12px", border: "1px solid var(--line)", borderRadius: "8px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "14px" }} />
           <input placeholder="Low stock alert at" type="number" value={lowStock} onChange={(e) => setLowStock(e.target.value)} style={{ padding: "10px 12px", border: "1px solid var(--line)", borderRadius: "8px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "14px" }} />
+          {error && <p style={{ gridColumn: "1 / -1", fontSize: "13px", color: "#dc2626", margin: 0 }}>{error}</p>}
           <div style={{ display: "flex", gap: "10px" }}>
             <button type="submit" disabled={saving} style={{ flex: 1, padding: "10px", backgroundColor: "var(--accent)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", opacity: saving ? 0.6 : 1 }}>
               {saving ? "Saving..." : editing ? "Update Item" : "Save Item"}
@@ -138,4 +143,3 @@ export default function InventoryPage() {
     </div>
   );
 }
-
