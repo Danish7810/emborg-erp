@@ -23,7 +23,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const sections = [
     { label: "Overview", items: [{ label: "Dashboard", href: "/dashboard" }] },
-    { label: "CRM", items: [{ label: "Contacts", href: "/dashboard/contacts" }, { label: "Leads", href: "/dashboard/leads" }] },
+    { label: "CRM", items: [{ label: "Contacts", href: "/dashboard/contacts" }, { label: "Leads", href: "/dashboard/leads" }, { label: "Pipeline Analytics", href: "/dashboard/pipeline" }] },
     { label: "Operations", items: [{ label: "Inventory", href: "/dashboard/inventory" }, { label: "Finance", href: "/dashboard/finance" }, { label: "HR and Payroll", href: "/dashboard/hr" }] },
   ];
 
@@ -63,4 +63,5 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+
 
