@@ -21,8 +21,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navItems = [
     { label: "Dashboard", href: "/dashboard" },
-    { label: "Contacts", href: "/dashboard/contacts" },
-    { label: "Leads", href: "/dashboard/leads" },
+    { label: "CRM - Contacts", href: "/dashboard/contacts" },
+    { label: "CRM - Leads", href: "/dashboard/leads" },
     { label: "Inventory", href: "/dashboard/inventory" },
     { label: "Finance", href: "/dashboard/finance" },
     { label: "HR and Payroll", href: "/dashboard/hr" },
@@ -56,5 +56,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+
+
 
 
