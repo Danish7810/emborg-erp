@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import { createClient } from "../../lib/supabase";
 
@@ -41,9 +41,10 @@ export default function LoginPage() {
         </form>
 
         <p style={{ fontSize: "13px", color: "var(--muted)", textAlign: "center", marginTop: "20px" }}>
-          No account yet? <a href="/auth/signup" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>Create one</a>
+          No account yet? <a href="/auth/reset" style={{ color: "var(--accent)", textDecoration: "none" }}>Forgot password?</a> | <a href="/auth/signup" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>Create one</a>
         </p>
       </div>
     </main>
   );
 }
+
