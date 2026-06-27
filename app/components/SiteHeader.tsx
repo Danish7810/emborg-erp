@@ -1,6 +1,7 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import Footer from "./Footer";
+import TawkChat from "./TawkChat";
 
 function MoonIcon() {
   return (
@@ -84,6 +85,9 @@ export default function SiteHeader({ children }: { children: React.ReactNode }) 
 
       <div>{children}</div>
       <Footer />
+      <TawkChat />
     </>
   );
 }
+
+
