@@ -5,6 +5,8 @@ import ModulesInfographic from "./components/ModulesInfographic";
 import ModuleDetail from "./components/ModuleDetail";
 import StatBar from "./components/StatBar";
 import Testimonials from "./components/Testimonials";
+import PlatformPillars from "./components/PlatformPillars";
+import TrustBar from "./components/TrustBar";
 import { modules } from "./data";
 import DashboardLink from "./components/DashboardLink";
 import PageWrapper from "./components/PageWrapper";
@@ -32,6 +34,7 @@ export default function Home() {
       </section>
 
       <StatBar />
+      <TrustBar />
 
       <section style={{ padding: "60px 40px", maxWidth: "900px", margin: "0 auto", textAlign: "center" }} className="fade-up">
         <p style={{ fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--accent)", margin: "0 0 14px 0" }}>About EMBORG</p>
@@ -65,6 +68,7 @@ export default function Home() {
         </div>
       </section>
 
+      <PlatformPillars />
       <Testimonials />
 
       <section style={{ padding: "80px 40px", textAlign: "center" }} className="fade-up">
@@ -75,6 +79,9 @@ export default function Home() {
     </main></PageWrapper>
   );
 }
+
+
+
 
 
 
