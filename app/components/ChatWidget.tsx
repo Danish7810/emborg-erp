@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useRef, useEffect } from "react";
 
 type Message = { role: "user" | "assistant"; text: string };
@@ -32,13 +32,13 @@ export default function ChatWidget() {
       }));
 
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             system_instruction: {
-              parts: [{ text: "You are EMBORG AI, a smart ERP assistant for EMBORG — a cloud ERP platform for small and medium businesses. You help users manage their CRM contacts, leads pipeline, inventory, finance (invoices and expenses), and HR and payroll. Be concise, helpful, and professional. If asked about specific data you don't have access to, tell the user to check the relevant module in the dashboard. Always stay in the context of business operations and ERP workflows." }]
+              parts: [{ text: "You are EMBORG AI, a smart ERP assistant for EMBORG â€” a cloud ERP platform for small and medium businesses. You help users manage their CRM contacts, leads pipeline, inventory, finance (invoices and expenses), and HR and payroll. Be concise, helpful, and professional. If asked about specific data you don't have access to, tell the user to check the relevant module in the dashboard. Always stay in the context of business operations and ERP workflows." }]
             },
             contents: [
               ...history,
@@ -171,3 +171,4 @@ export default function ChatWidget() {
     </>
   );
 }
+
