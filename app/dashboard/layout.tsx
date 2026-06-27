@@ -25,6 +25,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { label: "Leads", href: "/dashboard/leads" },
     { label: "Inventory", href: "/dashboard/inventory" },
     { label: "Finance", href: "/dashboard/finance" },
+    { label: "HR and Payroll", href: "/dashboard/hr" },
   ];
 
   return (
@@ -55,4 +56,5 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+
 
