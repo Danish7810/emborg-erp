@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import useScrollReveal from "../hooks/useScrollReveal";
 
 export default function Pricing() {
@@ -30,7 +30,7 @@ export default function Pricing() {
                 <span style={{ fontSize: "15px", color: plan.highlight ? "rgba(255,255,255,0.6)" : "var(--muted)" }}>{plan.period}</span>
               </div>
               <p style={{ color: plan.highlight ? "rgba(255,255,255,0.75)" : "var(--muted)", fontSize: "14px", margin: "0 0 22px 0" }}>{plan.desc}</p>
-              <a href="/contact" className="btn-primary" style={{ display: "inline-block", padding: "11px 24px", backgroundColor: plan.highlight ? "white" : "var(--accent)", color: plan.highlight ? "var(--ink)" : "white", borderRadius: "20px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Get started</a>
+              <a href="/auth/signup" className="btn-primary" style={{ display: "inline-block", padding: "11px 24px", backgroundColor: plan.highlight ? "white" : "var(--accent)", color: plan.highlight ? "var(--ink)" : "white", borderRadius: "20px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Get started</a>
             </div>
           ))}
         </div>
@@ -48,3 +48,4 @@ export default function Pricing() {
     </main>
   );
 }
+
