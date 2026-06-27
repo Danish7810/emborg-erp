@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import { createClient } from "../../lib/supabase";
 
@@ -107,7 +107,7 @@ export default function ContactsPage() {
             <tbody>
               {filtered.map((c, i) => (
                 <tr key={c.id} style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--line)" : "none" }}>
-                  <td style={{ padding: "14px 16px", color: "var(--ink)", fontWeight: 500 }}>{c.full_name}</td>
+                  <td style={{ padding: "14px 16px", color: "var(--ink)", fontWeight: 500 }}><a href={`/dashboard/contacts/${c.id}`} style={{ color: "var(--ink)", textDecoration: "none", fontWeight: 600 }}>{c.full_name}</a></td>
                   <td style={{ padding: "14px 16px", color: "var(--muted)" }}>{c.company_name || "-"}</td>
                   <td style={{ padding: "14px 16px", color: "var(--muted)" }}>{c.email || "-"}</td>
                   <td style={{ padding: "14px 16px", color: "var(--muted)" }}>{c.phone || "-"}</td>
@@ -124,3 +124,5 @@ export default function ContactsPage() {
     </div>
   );
 }
+
+
