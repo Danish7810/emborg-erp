@@ -1,51 +1,140 @@
-﻿"use client";
-import useScrollReveal from "../hooks/useScrollReveal";
+"use client";
+import { useEffect } from "react";
 
-export default function Pricing() {
-  useScrollReveal();
+const PLANS = [
+  {
+    name: "Starter",
+    price: 999,
+    priceLabel: "₹999",
+    period: "/month",
+    description: "Perfect for freelancers and micro businesses",
+    color: "#3B82F6",
+    features: ["Up to 100 contacts", "CRM & Leads", "Basic Inventory", "Finance tracking", "Email support"],
+    popular: false,
+  },
+  {
+    name: "Pro",
+    price: 2499,
+    priceLabel: "₹2,499",
+    period: "/month",
+    description: "For growing SMEs that need more power",
+    color: "#6366F1",
+    features: ["Unlimited contacts", "Full CRM + Pipeline Analytics", "Advanced Inventory", "Invoicing + Expenses", "HR & Payroll", "AI Assistant", "Priority support"],
+    popular: true,
+  },
+  {
+    name: "Enterprise",
+    price: 5999,
+    priceLabel: "₹5,999",
+    period: "/month",
+    description: "For established businesses at scale",
+    color: "#10B981",
+    features: ["Everything in Pro", "Multiple users", "Custom integrations", "Dedicated account manager", "SLA guarantee", "Custom reports", "API access"],
+    popular: false,
+  },
+];
 
-  const plans = [
-    { name: "Starter", price: "$19", period: "/month", desc: "For small businesses getting started.", highlight: false },
-    { name: "Business", price: "$49", period: "/month", desc: "Best for growing SMEs.", highlight: true },
-    { name: "Enterprise", price: "Custom", period: "", desc: "For large organizations with custom needs.", highlight: false }
-  ];
+declare global {
+  interface Window { Razorpay: any; }
+}
+
+export default function PricingPage() {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => { document.body.removeChild(script); };
+  }, []);
+
+  function handleSubscribe(plan: typeof PLANS[0]) {
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      amount: plan.price * 100,
+      currency: "INR",
+      name: "EMBORG",
+      description: plan.name + " Plan - Monthly Subscription",
+      image: "/brand/logo.svg",
+      handler: function(response: any) {
+        alert("Payment successful! Payment ID: " + response.razorpay_payment_id + ". Welcome to EMBORG " + plan.name + "!");
+      },
+      prefill: { name: "", email: "", contact: "" },
+      notes: { plan: plan.name },
+      theme: { color: plan.color },
+      modal: { ondismiss: function() { console.log("Payment dismissed"); } }
+    };
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  }
 
   return (
-    <main>
-      <section style={{ padding: "100px 40px 20px", maxWidth: "700px", margin: "0 auto", textAlign: "center" }} className="fade-up">
-        <h1 className="tight" style={{ fontSize: "44px", fontWeight: 700, color: "var(--ink)", margin: 0, lineHeight: 1.1 }}>Simple, transparent pricing.</h1>
-        <p style={{ fontSize: "17px", color: "var(--muted)", marginTop: "18px", lineHeight: 1.5 }}>No hidden fees. Cancel anytime. Switch plans as you grow.</p>
-      </section>
+    <div style={{ minHeight: "100vh", backgroundColor: "var(--bg)", padding: "60px 20px" }}>
+      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
 
-      <section style={{ padding: "60px 40px 30px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "20px", maxWidth: "960px", margin: "0 auto" }}>
-          {plans.map((plan, i) => (
-            <div key={i} className="fade-up card-interactive" style={{ padding: "32px", backgroundColor: plan.highlight ? "var(--ink)" : "var(--bg-alt)", border: plan.highlight ? "none" : "1px solid var(--line)", borderRadius: "18px", textAlign: "center" }}>
-              {plan.highlight && (
-                <div style={{ display: "inline-block", padding: "4px 12px", backgroundColor: "var(--accent)", color: "white", borderRadius: "12px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "16px" }}>Most popular</div>
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: "56px" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 16px", backgroundColor: "#6366F122", borderRadius: "20px", marginBottom: "16px" }}>
+            <span style={{ fontSize: "13px", color: "#6366F1", fontWeight: 600 }}>Simple, transparent pricing</span>
+          </div>
+          <h1 className="tight" style={{ fontSize: "48px", fontWeight: 800, color: "var(--ink)", margin: "0 0 16px 0" }}>Choose your plan</h1>
+          <p style={{ fontSize: "18px", color: "var(--muted)", maxWidth: "500px", margin: "0 auto" }}>Start free, scale as you grow. No hidden fees.</p>
+        </div>
+
+        {/* Plans */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "24px", alignItems: "start" }}>
+          {PLANS.map(plan => (
+            <div key={plan.name} style={{
+              backgroundColor: "var(--bg-alt)", borderRadius: "20px", padding: "32px",
+              border: plan.popular ? `2px solid ${plan.color}` : "1px solid var(--line)",
+              position: "relative", transform: plan.popular ? "scale(1.02)" : "scale(1)"
+            }}>
+              {plan.popular && (
+                <div style={{
+                  position: "absolute", top: "-14px", left: "50%", transform: "translateX(-50%)",
+                  backgroundColor: plan.color, color: "white", fontSize: "12px", fontWeight: 700,
+                  padding: "4px 16px", borderRadius: "20px", whiteSpace: "nowrap"
+                }}>MOST POPULAR</div>
               )}
-              <h3 style={{ color: plan.highlight ? "white" : "var(--ink)", margin: "0 0 6px 0", fontSize: "18px" }}>{plan.name}</h3>
-              <div style={{ margin: "10px 0 14px 0" }}>
-                <span className="tight" style={{ fontSize: "36px", fontWeight: 700, color: plan.highlight ? "white" : "var(--ink)" }}>{plan.price}</span>
-                <span style={{ fontSize: "15px", color: plan.highlight ? "rgba(255,255,255,0.6)" : "var(--muted)" }}>{plan.period}</span>
+              <div style={{ marginBottom: "24px" }}>
+                <div style={{ width: "40px", height: "40px", borderRadius: "10px", backgroundColor: plan.color + "22", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
+                  <div style={{ width: "16px", height: "16px", borderRadius: "50%", backgroundColor: plan.color }} />
+                </div>
+                <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--ink)", margin: "0 0 4px 0" }}>{plan.name}</h2>
+                <p style={{ fontSize: "13px", color: "var(--muted)", margin: 0 }}>{plan.description}</p>
               </div>
-              <p style={{ color: plan.highlight ? "rgba(255,255,255,0.75)" : "var(--muted)", fontSize: "14px", margin: "0 0 22px 0" }}>{plan.desc}</p>
-              <a href="/auth/signup" className="btn-primary" style={{ display: "inline-block", padding: "11px 24px", backgroundColor: plan.highlight ? "white" : "var(--accent)", color: plan.highlight ? "var(--ink)" : "white", borderRadius: "20px", textDecoration: "none", fontWeight: 600, fontSize: "14px" }}>Get started</a>
+              <div style={{ marginBottom: "28px" }}>
+                <span style={{ fontSize: "42px", fontWeight: 800, color: plan.color }}>{plan.priceLabel}</span>
+                <span style={{ fontSize: "14px", color: "var(--muted)" }}>{plan.period}</span>
+              </div>
+              <ul style={{ listStyle: "none", padding: 0, margin: "0 0 28px 0", display: "flex", flexDirection: "column", gap: "10px" }}>
+                {plan.features.map(f => (
+                  <li key={f} style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "14px", color: "var(--ink)" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={plan.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => handleSubscribe(plan)}
+                style={{
+                  width: "100%", padding: "14px", borderRadius: "12px", border: "none",
+                  backgroundColor: plan.popular ? plan.color : "transparent",
+                  color: plan.popular ? "white" : plan.color,
+                  border: plan.popular ? "none" : `2px solid ${plan.color}`,
+                  fontSize: "15px", fontWeight: 700, cursor: "pointer"
+                }}
+              >
+                Get started with {plan.name}
+              </button>
             </div>
           ))}
         </div>
-      </section>
 
-      <section style={{ padding: "20px 40px 100px", textAlign: "center" }} className="fade-up">
-        <p style={{ fontSize: "13px", color: "var(--muted)", marginBottom: "14px" }}>Secure payments accepted via</p>
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "8px", padding: "8px 14px" }}>Visa</span>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "8px", padding: "8px 14px" }}>Mastercard</span>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "8px", padding: "8px 14px" }}>UPI</span>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "8px", padding: "8px 14px" }}>Net Banking</span>
-        </div>
-      </section>
-    </main>
+        {/* Footer note */}
+        <p style={{ textAlign: "center", fontSize: "13px", color: "var(--muted)", marginTop: "40px" }}>
+          All plans include a 14-day free trial. No credit card required to start.
+        </p>
+      </div>
+    </div>
   );
 }
-
