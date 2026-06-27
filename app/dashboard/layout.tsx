@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import { createClient } from "../lib/supabase";
 
@@ -24,6 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { label: "Contacts", href: "/dashboard/contacts" },
     { label: "Leads", href: "/dashboard/leads" },
     { label: "Inventory", href: "/dashboard/inventory" },
+    { label: "Finance", href: "/dashboard/finance" },
   ];
 
   return (
@@ -54,3 +55,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+
