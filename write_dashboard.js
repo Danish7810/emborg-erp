@@ -1,4 +1,5 @@
-"use client";
+﻿const fs = require("fs");
+const content = `"use client";
 import { useEffect, useState } from "react";
 import { createClient } from "../lib/supabase";
 
@@ -165,7 +166,7 @@ export default function DashboardPage() {
       {quickAction === "lead" && (
         <form onSubmit={handleQuickLead} style={{ padding: "20px", border: "1px solid var(--accent)", borderRadius: "14px", backgroundColor: "var(--bg-alt)", display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "flex-end" }}>
           <div style={{ flex: 2, minWidth: "200px" }}><label style={{ fontSize: "11px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", display: "block", marginBottom: "4px" }}>Lead Title</label><input value={qaTitle} onChange={(e) => setQaTitle(e.target.value)} required style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--line)", borderRadius: "8px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "13px", boxSizing: "border-box" }} /></div>
-          <div style={{ flex: 1, minWidth: "120px" }}><label style={{ fontSize: "11px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", display: "block", marginBottom: "4px" }}>Value ($)</label><input value={qaValue} onChange={(e) => setQaValue(e.target.value)} type="number" style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--line)", borderRadius: "8px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "13px", boxSizing: "border-box" }} /></div>
+          <div style={{ flex: 1, minWidth: "120px" }}><label style={{ fontSize: "11px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", display: "block", marginBottom: "4px" }}>Value (\$)</label><input value={qaValue} onChange={(e) => setQaValue(e.target.value)} type="number" style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--line)", borderRadius: "8px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "13px", boxSizing: "border-box" }} /></div>
           <button type="submit" disabled={saving} style={{ padding: "9px 20px", backgroundColor: "var(--accent)", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, fontSize: "13px", cursor: "pointer" }}>{saving ? "Saving..." : "Save"}</button>
           <button type="button" onClick={() => setQuickAction(null)} style={{ padding: "9px 16px", backgroundColor: "transparent", color: "var(--muted)", border: "1px solid var(--line)", borderRadius: "8px", fontSize: "13px", cursor: "pointer" }}>Cancel</button>
         </form>
@@ -175,8 +176,8 @@ export default function DashboardPage() {
         {[
           { label: "Total Contacts", value: contacts.length, prefix: "", color: "#3B82F6", href: "/dashboard/contacts" },
           { label: "Active Leads", value: activeLeads.length, prefix: "", color: "#8B5CF6", href: "/dashboard/leads" },
-          { label: "Pipeline Value", value: totalPipeline.toLocaleString(), prefix: "$", color: "#F59E0B", href: "/dashboard/leads" },
-          { label: "Won Revenue", value: totalRevenue.toLocaleString(), prefix: "$", color: "#10B981", href: "/dashboard/finance" },
+          { label: "Pipeline Value", value: totalPipeline.toLocaleString(), prefix: "\$", color: "#F59E0B", href: "/dashboard/leads" },
+          { label: "Won Revenue", value: totalRevenue.toLocaleString(), prefix: "\$", color: "#10B981", href: "/dashboard/finance" },
           { label: "Conversion Rate", value: conversionRate, prefix: "", suffix: "%", color: "#06B6D4", href: "/dashboard/leads" },
           { label: "Active Employees", value: activeEmployees, prefix: "", color: "#EC4899", href: "/dashboard/hr" },
         ].map((card, i) => (
@@ -195,7 +196,7 @@ export default function DashboardPage() {
               <div key={s.stage}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
                   <span style={{ fontSize: "13px", color: "var(--ink)", fontWeight: 500 }}>{STAGE_LABELS[s.stage]}</span>
-                  <span style={{ fontSize: "12px", color: "var(--muted)" }}>{s.count} leads {s.value > 0 ? "· $"+s.value.toLocaleString() : ""}</span>
+                  <span style={{ fontSize: "12px", color: "var(--muted)" }}>{s.count} leads {s.value > 0 ? "· \$"+s.value.toLocaleString() : ""}</span>
                 </div>
                 <div style={{ height: "8px", backgroundColor: "var(--line)", borderRadius: "4px", overflow: "hidden" }}>
                   <div style={{ height: "100%", width: (s.count / maxCount * 100) + "%", backgroundColor: STAGE_COLORS[s.stage], borderRadius: "4px", transition: "width 0.3s" }} />
@@ -215,7 +216,7 @@ export default function DashboardPage() {
             {[
               { label: "Conversion", value: conversionRate + "%" },
               { label: "Contacts", value: contacts.length },
-              { label: "Revenue", value: "$" + totalRevenue.toLocaleString() },
+              { label: "Revenue", value: "\$" + totalRevenue.toLocaleString() },
               { label: "Pipeline", value: activeLeads.length + " deals" },
             ].map((item, i) => (
               <div key={i} style={{ display: "flex", justifyContent: "space-between" }}>
@@ -247,7 +248,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ fontSize: "12px", color: "var(--accent)", fontWeight: 600 }}>${(lead.value||0).toLocaleString()}</span>
+                      <span style={{ fontSize: "12px", color: "var(--accent)", fontWeight: 600 }}>\${(lead.value||0).toLocaleString()}</span>
                       <span style={{ fontSize: "11px", padding: "2px 8px", borderRadius: "8px", backgroundColor: STAGE_COLORS[lead.status] + "18", color: STAGE_COLORS[lead.status], fontWeight: 600 }}>{lead.status}</span>
                     </div>
                   </div>
@@ -319,7 +320,7 @@ export default function DashboardPage() {
             {[
               { label: "Won Deals", value: wonLeads.length, color: "#10B981" },
               { label: "Lost Deals", value: lostLeads.length, color: "#EF4444" },
-              { label: "Paid Invoices", value: "$"+paidInvoices.toLocaleString(), color: "#3B82F6" },
+              { label: "Paid Invoices", value: "\$"+paidInvoices.toLocaleString(), color: "#3B82F6" },
               { label: "Team Size", value: activeEmployees, color: "#8B5CF6" },
             ].map((item, i) => (
               <div key={i} style={{ padding: "14px", backgroundColor: "var(--bg)", borderRadius: "10px", border: "1px solid var(--line)", textAlign: "center" }}>
@@ -354,3 +355,6 @@ export default function DashboardPage() {
     </div>
   );
 }
+`;
+fs.writeFileSync("app/dashboard/page.tsx", content, "utf8");
+console.log("Done:", fs.statSync("app/dashboard/page.tsx").size, "bytes");
