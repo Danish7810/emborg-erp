@@ -1,4 +1,6 @@
-"use client";
+const fs = require("fs");
+
+const pricing = `"use client";
 import { useEffect } from "react";
 
 const PLANS = [
@@ -135,3 +137,7 @@ export default function PricingPage() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync("app/pricing/page.tsx", pricing, "utf8");
+console.log("Done:", fs.statSync("app/pricing/page.tsx").size, "bytes");
