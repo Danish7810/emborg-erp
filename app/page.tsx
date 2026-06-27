@@ -6,6 +6,7 @@ import ModuleDetail from "./components/ModuleDetail";
 import StatBar from "./components/StatBar";
 import Testimonials from "./components/Testimonials";
 import { modules } from "./data";
+import DashboardLink from "./components/DashboardLink";
 import PageWrapper from "./components/PageWrapper";
 
 export default function Home() {
@@ -21,7 +22,7 @@ export default function Home() {
           <p style={{ fontSize: "19px", marginTop: "24px", color: "var(--muted)", maxWidth: "480px", lineHeight: 1.5 }}>EMBORG brings finance, inventory, CRM, HR, sales, and projects together, so nothing falls through the cracks.</p>
           <div style={{ marginTop: "36px", display: "flex", gap: "14px", flexWrap: "wrap" }}>
             <a href="/contact" className="btn-primary" style={{ padding: "13px 26px", backgroundColor: "var(--accent)", color: "white", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Request a demo</a>
-            <a href="/features" className="btn-secondary" style={{ padding: "13px 26px", backgroundColor: "transparent", color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Explore features</a>
+            <DashboardLink /><a href="/features" className="btn-secondary" style={{ padding: "13px 26px", backgroundColor: "transparent", color: "var(--ink)", border: "1px solid var(--line)", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Explore features</a>
           </div>
         </div>
 
@@ -74,5 +75,7 @@ export default function Home() {
     </main></PageWrapper>
   );
 }
+
+
 
 

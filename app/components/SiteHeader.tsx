@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Footer from "./Footer";
 import TawkChat from "./TawkChat";
+import { createClient } from "../lib/supabase";
 
 function MoonIcon() {
   return (
@@ -23,6 +24,7 @@ function SunIcon() {
 export default function SiteHeader({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("emborg-theme");
@@ -30,6 +32,8 @@ export default function SiteHeader({ children }: { children: React.ReactNode }) 
     const isDark = saved ? saved === "dark" : prefersDark;
     setDark(isDark);
     document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => { if (data.user) setLoggedIn(true); });
   }, []);
 
   function toggleTheme() {
@@ -56,8 +60,14 @@ export default function SiteHeader({ children }: { children: React.ReactNode }) 
             <button onClick={toggleTheme} className="theme-toggle" aria-label="Toggle dark mode">
               {dark ? <MoonIcon /> : <SunIcon />}
             </button>
-            <a href="/auth/login" className="link-hover" style={{ textDecoration: "none", color: "var(--muted)", fontSize: "14px" }}>Login</a>
-            <a href="/auth/signup" className="btn-primary" style={{ backgroundColor: "var(--accent)", color: "white", padding: "9px 18px", borderRadius: "20px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>Get Started</a>
+            {loggedIn ? (
+              <a href="/dashboard" className="btn-primary" style={{ backgroundColor: "var(--accent)", color: "white", padding: "9px 18px", borderRadius: "20px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>Dashboard</a>
+            ) : (
+              <>
+                <a href="/auth/login" className="link-hover" style={{ textDecoration: "none", color: "var(--muted)", fontSize: "14px" }}>Login</a>
+                <a href="/auth/signup" className="btn-primary" style={{ backgroundColor: "var(--accent)", color: "white", padding: "9px 18px", borderRadius: "20px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>Get Started</a>
+              </>
+            )}
           </nav>
 
           <button onClick={() => setOpen(!open)} className="nav-toggle" aria-label="Toggle menu" aria-expanded={open} style={{ background: "none", border: "none", padding: "6px", cursor: "pointer" }}>
@@ -76,12 +86,18 @@ export default function SiteHeader({ children }: { children: React.ReactNode }) 
           <a href="/features" onClick={() => setOpen(false)} style={{ textDecoration: "none", color: "var(--ink)", fontSize: "16px", padding: "10px 0" }}>Features</a>
           <a href="/pricing" onClick={() => setOpen(false)} style={{ textDecoration: "none", color: "var(--ink)", fontSize: "16px", padding: "10px 0" }}>Pricing</a>
           <a href="/contact" onClick={() => setOpen(false)} style={{ textDecoration: "none", color: "var(--ink)", fontSize: "16px", padding: "10px 0" }}>Contact</a>
-          <a href="/auth/login" onClick={() => setOpen(false)} style={{ textDecoration: "none", color: "var(--ink)", fontSize: "16px", padding: "10px 0" }}>Login</a>
           <button onClick={toggleTheme} style={{ display: "flex", alignItems: "center", gap: "8px", background: "none", border: "none", color: "var(--ink)", fontSize: "16px", padding: "10px 0", cursor: "pointer", textAlign: "left" }}>
             {dark ? <MoonIcon /> : <SunIcon />}
             <span>{dark ? "Dark mode" : "Light mode"}</span>
           </button>
-          <a href="/auth/signup" onClick={() => setOpen(false)} style={{ backgroundColor: "var(--accent)", color: "white", padding: "11px 18px", borderRadius: "20px", fontSize: "15px", fontWeight: 600, textDecoration: "none", textAlign: "center", marginTop: "8px" }}>Get Started</a>
+          {loggedIn ? (
+            <a href="/dashboard" onClick={() => setOpen(false)} style={{ backgroundColor: "var(--accent)", color: "white", padding: "11px 18px", borderRadius: "20px", fontSize: "15px", fontWeight: 600, textDecoration: "none", textAlign: "center", marginTop: "8px" }}>Dashboard</a>
+          ) : (
+            <>
+              <a href="/auth/login" onClick={() => setOpen(false)} style={{ textDecoration: "none", color: "var(--ink)", fontSize: "16px", padding: "10px 0" }}>Login</a>
+              <a href="/auth/signup" onClick={() => setOpen(false)} style={{ backgroundColor: "var(--accent)", color: "white", padding: "11px 18px", borderRadius: "20px", fontSize: "15px", fontWeight: 600, textDecoration: "none", textAlign: "center", marginTop: "8px" }}>Get Started</a>
+            </>
+          )}
         </div>
       </header>
 
