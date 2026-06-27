@@ -17,18 +17,15 @@ export default function SignupPage() {
     setError("");
     const supabase = createClient();
 
-    const { data, error: signupError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { full_name: fullName, company_name: companyName } }
-    });
-
+    const { data, error: signupError } = await supabase.auth.signUp({ email, password, options: { data: { full_name: fullName, company_name: companyName } } });
     if (signupError) { setError(signupError.message); setLoading(false); return; }
+    if (!data.user) { setError("Signup failed. Please try again."); setLoading(false); return; }
 
-    if (data.user) {
-      const { error: companyError } = await supabase.from("companies").insert({ name: companyName }).select().single();
-      if (companyError) { setError(companyError.message); setLoading(false); return; }
-    }
+    const { data: company, error: companyError } = await supabase.from("companies").insert({ name: companyName }).select().single();
+    if (companyError) { setError("Could not create company: " + companyError.message); setLoading(false); return; }
+
+    const { error: profileError } = await supabase.from("profiles").insert({ id: data.user.id, company_id: company.id, full_name: fullName, email });
+    if (profileError) { setError("Could not create profile: " + profileError.message); setLoading(false); return; }
 
     setDone(true);
     setLoading(false);
