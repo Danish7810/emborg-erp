@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState } from "react";
 import useScrollReveal from "./hooks/useScrollReveal";
 import ModulesInfographic from "./components/ModulesInfographic";
@@ -6,6 +6,7 @@ import ModuleDetail from "./components/ModuleDetail";
 import StatBar from "./components/StatBar";
 import Testimonials from "./components/Testimonials";
 import { modules } from "./data";
+import PageWrapper from "./components/PageWrapper";
 
 export default function Home() {
   useScrollReveal();
@@ -13,7 +14,7 @@ export default function Home() {
   const selected = modules.find((m) => m.id === selectedId) || null;
 
   return (
-    <main>
+    <PageWrapper><main>
       <section className="hero-glow" style={{ padding: "100px 40px 40px", display: "flex", alignItems: "center", gap: "60px", maxWidth: "1200px", margin: "0 auto", flexWrap: "wrap" }}>
         <div style={{ flex: "1 1 420px" }} className="fade-up">
           <h1 className="tight" style={{ fontSize: "56px", fontWeight: 700, color: "var(--ink)", lineHeight: 1.05, margin: 0 }}>Run your entire business in one system.</h1>
@@ -70,6 +71,8 @@ export default function Home() {
         <p style={{ fontSize: "16px", color: "var(--muted)", margin: "0 0 28px 0" }}>Book a short walkthrough with our team, no commitment required.</p>
         <a href="/contact" className="btn-primary" style={{ padding: "13px 28px", backgroundColor: "var(--accent)", color: "white", borderRadius: "24px", textDecoration: "none", fontWeight: 600, fontSize: "15px" }}>Request a demo</a>
       </section>
-    </main>
+    </main></PageWrapper>
   );
 }
+
+

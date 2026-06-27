@@ -1,5 +1,6 @@
 ﻿import "./globals.css";
 import SiteHeader from "./components/SiteHeader";
+import PageWrapper from "./components/PageWrapper";
 
 export const metadata = {
   title: "EMBORG ERP - Simplifying Business Operations",
@@ -18,11 +19,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <SiteHeader>{children}</SiteHeader>
+        <SiteHeader><PageWrapper>{children}</PageWrapper></SiteHeader>
       </body>
     </html>
   );
 }
+
+
 
 
 
