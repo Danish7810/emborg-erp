@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useEffect, useState } from "react";
 import { createClient } from "../lib/supabase";
+import ChatWidget from "../components/ChatWidget";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [userEmail, setUserEmail] = useState("");
@@ -61,7 +62,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {children}
       </main>
     </div>
+      <ChatWidget />
+    </div>
   );
 }
+
+
 
 
