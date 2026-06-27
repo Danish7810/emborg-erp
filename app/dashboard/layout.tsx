@@ -61,7 +61,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <main style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
         {children}
       </main>
-    </div>
       <ChatWidget />
     </div>
   );
