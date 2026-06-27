@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 import { useEffect } from "react";
 
 const PLANS = [
   {
     name: "Starter",
     price: 999,
-    priceLabel: "₹999",
+    priceLabel: "â‚¹999",
     period: "/month",
     description: "Perfect for freelancers and micro businesses",
     color: "#3B82F6",
@@ -15,7 +15,7 @@ const PLANS = [
   {
     name: "Pro",
     price: 2499,
-    priceLabel: "₹2,499",
+    priceLabel: "â‚¹2,499",
     period: "/month",
     description: "For growing SMEs that need more power",
     color: "#6366F1",
@@ -25,7 +25,7 @@ const PLANS = [
   {
     name: "Enterprise",
     price: 5999,
-    priceLabel: "₹5,999",
+    priceLabel: "â‚¹5,999",
     period: "/month",
     description: "For established businesses at scale",
     color: "#10B981",
@@ -120,7 +120,7 @@ export default function PricingPage() {
                   width: "100%", padding: "14px", borderRadius: "12px", border: "none",
                   backgroundColor: plan.popular ? plan.color : "transparent",
                   color: plan.popular ? "white" : plan.color,
-                  border: plan.popular ? "none" : `2px solid ${plan.color}`,
+                  outline: plan.popular ? "none" : `2px solid ${plan.color}`,
                   fontSize: "15px", fontWeight: 700, cursor: "pointer"
                 }}
               >
@@ -138,3 +138,4 @@ export default function PricingPage() {
     </div>
   );
 }
+
