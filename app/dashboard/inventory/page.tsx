@@ -1,4 +1,4 @@
-"use client";
+ï»¿"use client";
 import { useEffect, useState } from "react";
 import { createClient } from "../../lib/supabase";
 
@@ -29,7 +29,6 @@ export default function InventoryPage() {
   useEffect(() => { fetchItems(); }, []);
 
   const filtered = items.filter((i) => i.name?.toLowerCase().includes(search.toLowerCase()) || i.sku?.toLowerCase().includes(search.toLowerCase()) || i.category?.toLowerCase().includes(search.toLowerCase()));
-
   const lowStockItems = items.filter((i) => i.quantity <= i.low_stock_alert);
 
   function openAdd() { setEditing(null); setName(""); setSku(""); setCategory(""); setQuantity("0"); setUnit("pcs"); setPrice("0"); setLowStock("10"); setShowForm(true); }
@@ -66,7 +65,7 @@ export default function InventoryPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
         <div>
           <h1 className="tight" style={{ fontSize: "28px", fontWeight: 700, color: "var(--ink)", margin: "0 0 4px 0" }}>Inventory</h1>
-          <p style={{ fontSize: "14px", color: "var(--muted)", margin: 0 }}>{items.length} items · {lowStockItems.length} low stock</p>
+          <p style={{ fontSize: "14px", color: "var(--muted)", margin: 0 }}>{items.length} items - {lowStockItems.length} low stock</p>
         </div>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
           <input placeholder="Search items..." value={search} onChange={(e) => setSearch(e.target.value)} style={{ padding: "9px 14px", border: "1px solid var(--line)", borderRadius: "20px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "14px", width: "200px" }} />
@@ -76,7 +75,7 @@ export default function InventoryPage() {
 
       {lowStockItems.length > 0 && (
         <div style={{ padding: "14px 18px", backgroundColor: "#FEF3C7", border: "1px solid #F59E0B", borderRadius: "12px", marginBottom: "20px", fontSize: "13px", color: "#92400E" }}>
-          <strong>Low stock alert:</strong> {lowStockItems.map((i) => `${i.name} (${i.quantity} ${i.unit})`).join(", ")}
+          <strong>Low stock alert:</strong> {lowStockItems.map((i) => i.name + " (" + i.quantity + " " + i.unit + ")").join(", ")}
         </div>
       )}
 
@@ -102,7 +101,7 @@ export default function InventoryPage() {
         <p style={{ color: "var(--muted)", fontSize: "14px" }}>Loading...</p>
       ) : filtered.length === 0 ? (
         <div style={{ padding: "60px 20px", textAlign: "center", border: "1px dashed var(--line)", borderRadius: "14px" }}>
-          <p style={{ color: "var(--muted)", fontSize: "14px", margin: "0 0 16px 0" }}>{search ? "No items match your search." : "No inventory items yet. Add your first product above."}</p>
+          <p style={{ color: "var(--muted)", fontSize: "14px", margin: 0 }}>{search ? "No items match your search." : "No inventory items yet. Add your first product above."}</p>
         </div>
       ) : (
         <div style={{ border: "1px solid var(--line)", borderRadius: "14px", overflow: "hidden" }}>
