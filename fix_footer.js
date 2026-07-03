@@ -1,4 +1,9 @@
-export default function Footer() {
+const fs = require('fs');
+const path = require('path');
+
+const footerPath = path.join('C:\\Users\\Danish\\emborg', 'app', 'components', 'Footer.tsx');
+
+const newFooter = `export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
@@ -54,3 +59,13 @@ export default function Footer() {
     </footer>
   );
 }
+`;
+
+fs.writeFileSync(footerPath, newFooter, { encoding: 'utf8' });
+console.log('✅ Footer.tsx fixed');
+console.log('   About → /about');
+console.log('   Blog → /blog');
+console.log('   Legal section: Privacy / Terms / Refund — all styled consistently');
+console.log('   Added support email');
+console.log('   Added "Built in India" tagline');
+console.log('\nRun: npm run build && git add . && git commit -m "Fix footer links" && git push');
