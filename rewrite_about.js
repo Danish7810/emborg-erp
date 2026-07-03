@@ -1,4 +1,7 @@
-"use client";
+const fs = require('fs');
+const path = require('path');
+
+const aboutPage = `"use client";
 import { useState } from "react";
 import useScrollReveal from "../hooks/useScrollReveal";
 import PageWrapper from "../components/PageWrapper";
@@ -162,7 +165,7 @@ export default function AboutPage() {
                 <div
                   key={i}
                   className="fade-up card-interactive"
-                  style={{ backgroundColor: "var(--bg)", borderRadius: "14px", padding: "24px", border: hoveredCard === i ? `2px solid ${m.color}` : "1px solid var(--line)", cursor: "default", transition: "box-shadow 0.2s, border 0.15s" }}
+                  style={{ backgroundColor: "var(--bg)", borderRadius: "14px", padding: "24px", border: hoveredCard === i ? \`2px solid \${m.color}\` : "1px solid var(--line)", cursor: "default", transition: "box-shadow 0.2s, border 0.15s" }}
                   onMouseEnter={() => setHoveredCard(i)}
                   onMouseLeave={() => setHoveredCard(null)}
                 >
@@ -310,3 +313,10 @@ export default function AboutPage() {
     </PageWrapper>
   );
 }
+`;
+
+const aboutPath = path.join('C:\\Users\\Danish\\emborg', 'app', 'about', 'page.tsx');
+fs.mkdirSync(path.dirname(aboutPath), { recursive: true });
+fs.writeFileSync(aboutPath, aboutPage, { encoding: 'utf8' });
+console.log('✅ app/about/page.tsx rewritten — matches homepage style exactly');
+console.log('\nRun: npm run build');
