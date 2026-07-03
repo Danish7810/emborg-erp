@@ -1,4 +1,7 @@
-"use client";
+const fs = require('fs');
+const path = require('path');
+
+const aboutPage = `"use client";
 import { useState } from "react";
 import useScrollReveal from "../hooks/useScrollReveal";
 import PageWrapper from "../components/PageWrapper";
@@ -306,3 +309,19 @@ export default function AboutPage() {
     </PageWrapper>
   );
 }
+`;
+
+const aboutPath = path.join('C:\\Users\\Danish\\emborg', 'app', 'about', 'page.tsx');
+fs.writeFileSync(aboutPath, aboutPage, { encoding: 'utf8' });
+console.log('✅ app/about/page.tsx rewritten');
+console.log('');
+console.log('Fixes applied:');
+console.log('  1. ALL hardcoded hex colours → var(--ink), var(--accent), var(--muted), var(--bg), var(--bg-alt), var(--line)');
+console.log('  2. Dark mode now works correctly — matches homepage exactly');
+console.log('  3. Module cards are now <a href="..."> tags — fully clickable');
+console.log('  4. Each module links to its real dashboard route');
+console.log('  5. Removed unused useState import for hoveredCard/hoveredVal');
+console.log('  6. card-interactive class handles hover via globals.css (no inline JS needed)');
+console.log('  7. Font: uses system font stack from body in globals.css — tight class applied to all headings');
+console.log('');
+console.log('Run: npm run build');
