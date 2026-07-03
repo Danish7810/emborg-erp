@@ -4,6 +4,7 @@ import useScrollReveal from "../hooks/useScrollReveal";
 import ModuleDetail from "../components/ModuleDetail";
 import { modules } from "../data";
 
+
 export default function Features() {
   useScrollReveal();
   const [selectedId, setSelectedId] = useState<string | null>(null);

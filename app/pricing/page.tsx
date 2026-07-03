@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 
+
 const PLANS = [
   {
     name: "Starter",
@@ -74,9 +75,7 @@ export default function PricingPage() {
           </div>
           <h1 className="tight" style={{ fontSize: "48px", fontWeight: 800, color: "var(--ink)", margin: "0 0 16px 0" }}>Choose your plan</h1>
           <p style={{ fontSize: "18px", color: "var(--muted)", maxWidth: "500px", margin: "0 auto" }}>Start free, scale as you grow. No hidden fees.</p>
-          <div style={{ marginTop: "12px", padding: "8px 16px", backgroundColor: "#F59E0B22", borderRadius: "8px", display: "inline-block" }}>
-            <span style={{ fontSize: "12px", color: "#F59E0B", fontWeight: 600 }}>TEST MODE: Use card 4111 1111 1111 1111, any future expiry, any CVV</span>
-          </div>
+          
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "24px", alignItems: "start" }}>

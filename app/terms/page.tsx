@@ -1,0 +1,82 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Terms of Service | EMBORG ERP',
+  description: 'EMBORG ERP Terms of Service — your agreement with us when using the platform.',
+  robots: 'noindex',
+}
+
+export default function TermsPage() {
+  return (
+    <main style={{ maxWidth: 800, margin: '0 auto', padding: '80px 24px', fontFamily: 'sans-serif', color: '#1a1a1a', lineHeight: 1.7 }}>
+      <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 8 }}>Terms of Service</h1>
+      <p style={{ color: '#666', marginBottom: 40 }}>Last updated: July 1, 2025</p>
+
+      <section style={{ marginBottom: 36 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>1. Acceptance</h2>
+        <p>By creating an account or using EMBORG ERP ("Service"), you agree to these Terms. If you are using EMBORG on behalf of a company, you represent that you have authority to bind that company.</p>
+      </section>
+
+      <section style={{ marginBottom: 36 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>2. The Service</h2>
+        <p>EMBORG is a cloud ERP SaaS platform providing CRM, Finance, Inventory, HR, Payroll, and related business modules. We reserve the right to modify, suspend, or discontinue any feature with reasonable notice.</p>
+      </section>
+
+      <section style={{ marginBottom: 36 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>3. Your Account</h2>
+        <ul style={{ paddingLeft: 20 }}>
+          <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
+          <li>You must provide accurate information at signup.</li>
+          <li>You are responsible for all activity under your account.</li>
+          <li>Notify us immediately at <a href="mailto:support@emborgerp.com" style={{ color: '#4F46E5' }}>support@emborgerp.com</a> of any unauthorized access.</li>
+        </ul>
+      </section>
+
+      <section style={{ marginBottom: 36 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>4. Acceptable Use</h2>
+        <p>You may not use EMBORG to:</p>
+        <ul style={{ paddingLeft: 20 }}>
+          <li>Violate any applicable law or regulation</li>
+          <li>Store or transmit malicious code</li>
+          <li>Reverse engineer, copy, or resell the Service</li>
+          <li>Upload content that infringes third-party rights</li>
+        </ul>
+      </section>
+
+      <section style={{ marginBottom: 36 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>5. Subscriptions & Payment</h2>
+        <p>Subscriptions are billed monthly or annually via Razorpay. Your subscription auto-renews unless cancelled before the renewal date. All prices are in INR and inclusive of applicable taxes. See our <a href="/refund" style={{ color: '#4F46E5' }}>Refund Policy</a> for cancellation terms.</p>
+      </section>
+
+      <section style={{ marginBottom: 36 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>6. Your Data</h2>
+        <p>You retain full ownership of the data you enter into EMBORG. We do not claim any intellectual property rights over your business data. See our <a href="/privacy" style={{ color: '#4F46E5' }}>Privacy Policy</a> for details on how we handle it.</p>
+      </section>
+
+      <section style={{ marginBottom: 36 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>7. Availability & SLA</h2>
+        <p>We target 99.5% monthly uptime. Planned maintenance will be announced in advance. We are not liable for downtime caused by third-party services (Supabase, Vercel, Razorpay).</p>
+      </section>
+
+      <section style={{ marginBottom: 36 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>8. Limitation of Liability</h2>
+        <p>To the maximum extent permitted by law, EMBORG shall not be liable for indirect, incidental, special, or consequential damages. Our total liability to you shall not exceed the amount paid by you in the three months preceding the claim.</p>
+      </section>
+
+      <section style={{ marginBottom: 36 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>9. Termination</h2>
+        <p>You may cancel your account at any time from Settings. We may suspend or terminate accounts that violate these Terms. On termination, you may export your data within 30 days before it is deleted.</p>
+      </section>
+
+      <section style={{ marginBottom: 36 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>10. Governing Law</h2>
+        <p>These Terms are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of courts in Hyderabad, Telangana.</p>
+      </section>
+
+      <section>
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12 }}>11. Contact</h2>
+        <p><a href="mailto:support@emborgerp.com" style={{ color: '#4F46E5' }}>support@emborgerp.com</a></p>
+      </section>
+    </main>
+  )
+}
