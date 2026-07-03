@@ -1,4 +1,9 @@
-import { Resend } from "resend";
+const fs = require('fs');
+const path = require('path');
+
+const routePath = path.join('C:\\Users\\Danish\\emborg', 'app', 'api', 'invite', 'route.ts');
+
+const newRoute = `import { Resend } from "resend";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { requireUser } from "../../lib/apiAuth";
@@ -69,7 +74,7 @@ export async function POST(req: NextRequest) {
       ? process.env.NEXT_PUBLIC_SITE_URL + "/auth/invite?token=" + invitation.token
       : "https://www.emborgerp.com/auth/invite?token=" + invitation.token;
 
-    const html = `<!DOCTYPE html>
+    const html = \`<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f8f8ff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
@@ -81,20 +86,20 @@ export async function POST(req: NextRequest) {
     <div style="padding:40px;">
       <h2 style="margin:0 0 12px;font-size:22px;font-weight:700;color:#1a1a2e;">You have been invited!</h2>
       <p style="margin:0 0 24px;font-size:15px;color:#666;line-height:1.6;">
-        <strong>${inviterName || "A team member"}</strong> has invited you to join <strong>${companyName || "their team"}</strong> on EMBORG as a <strong>${role}</strong>.
+        <strong>\${inviterName || "A team member"}</strong> has invited you to join <strong>\${companyName || "their team"}</strong> on EMBORG as a <strong>\${role}</strong>.
       </p>
-      <a href="${inviteUrl}" style="display:inline-block;padding:14px 32px;background:#6366F1;color:white;text-decoration:none;border-radius:10px;font-weight:700;font-size:15px;margin-bottom:24px;">
+      <a href="\${inviteUrl}" style="display:inline-block;padding:14px 32px;background:#6366F1;color:white;text-decoration:none;border-radius:10px;font-weight:700;font-size:15px;margin-bottom:24px;">
         Accept Invitation
       </a>
       <p style="margin:0 0 8px;font-size:13px;color:#888;">Or copy this link:</p>
-      <p style="margin:0;font-size:12px;color:#6366F1;word-break:break-all;">${inviteUrl}</p>
+      <p style="margin:0;font-size:12px;color:#6366F1;word-break:break-all;">\${inviteUrl}</p>
       <div style="margin-top:32px;padding-top:24px;border-top:1px solid #eee;text-align:center;">
         <p style="margin:0;font-size:12px;color:#aaa;">Sent via <strong style="color:#6366F1;">EMBORG</strong> - emborgerp.com</p>
       </div>
     </div>
   </div>
 </body>
-</html>`;
+</html>\`;
 
     await resend.emails.send({
       from: "EMBORG <onboarding@resend.dev>",
@@ -109,3 +114,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to send invite" }, { status: 500 });
   }
 }
+`;
+
+fs.writeFileSync(routePath, newRoute, { encoding: 'utf8' });
+console.log('✅ app/api/invite/route.ts fixed:');
+console.log('   1. Now requires a logged-in user (requireUser())');
+console.log('   2. Verifies caller actually belongs to the companyId they claim');
+console.log('   3. Optionally restricts inviting to Admin role only');
+console.log('   4. Uses SERVICE ROLE key explicitly for the actual DB writes (bypasses RLS safely, only after permission check)');
+console.log('   5. No more silent fallback to anon key');
+console.log('');
+console.log('⚠️  ACTION NEEDED: Confirm SUPABASE_SERVICE_KEY is set in:');
+console.log('    1. .env.local (for local dev)');
+console.log('    2. Vercel → Project → Settings → Environment Variables (for production)');
+console.log('    Get it from: Supabase Dashboard → Settings → API → service_role key (secret)');
+console.log('    NEVER expose this key in NEXT_PUBLIC_ variables or client-side code.');
+console.log('');
+console.log('Run: npm run build');
