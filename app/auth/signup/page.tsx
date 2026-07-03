@@ -56,11 +56,11 @@ export default function SignupPage() {
         <h1 className="tight" style={{ fontSize: "24px", fontWeight: 700, color: "var(--ink)", margin: "0 0 8px 0", textAlign: "center" }}>Create your account</h1>
         <p style={{ fontSize: "14px", color: "var(--muted)", textAlign: "center", margin: "0 0 28px 0" }}>Start your free EMBORG CRM today</p>
 
-        <form onSubmit={handleSignup} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          <input type="text" placeholder="Your full name" value={fullName} onChange={(e) => setFullName(e.target.value)} required style={{ padding: "12px", border: "1px solid var(--line)", borderRadius: "10px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "14px" }} />
-          <input type="text" placeholder="Company name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required style={{ padding: "12px", border: "1px solid var(--line)", borderRadius: "10px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "14px" }} />
-          <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ padding: "12px", border: "1px solid var(--line)", borderRadius: "10px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "14px" }} />
-          <input type="password" placeholder="Password (min 6 characters)" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} style={{ padding: "12px", border: "1px solid var(--line)", borderRadius: "10px", backgroundColor: "var(--ink)", color: "var(--ink)", fontSize: "14px" }} />
+        <form onSubmit={handleSignup} autoComplete="off" style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          <input type="text" placeholder="Your full name" autoComplete="off" value={fullName} onChange={(e) => setFullName(e.target.value)} required style={{ padding: "12px", border: "1px solid var(--line)", borderRadius: "10px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "14px" }} />
+          <input type="text" placeholder="Company name" autoComplete="organization" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required style={{ padding: "12px", border: "1px solid var(--line)", borderRadius: "10px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "14px" }} />
+          <input type="email" placeholder="Email address" autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ padding: "12px", border: "1px solid var(--line)", borderRadius: "10px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "14px" }} />
+          <input type="password" placeholder="Password (min 6 characters)" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} style={{ padding: "12px", border: "1px solid var(--line)", borderRadius: "10px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "14px" }} />
 
           {error && <p style={{ fontSize: "13px", color: "#dc2626", margin: 0 }}>{error}</p>}
 
