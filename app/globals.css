@@ -31,7 +31,7 @@ html {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   margin: 0;
   transition: background 0.3s ease, color 0.3s ease;
@@ -180,4 +180,19 @@ a, button {
   .card-interactive:hover, .btn-primary:hover {
     transform: none;
   }
+}
+
+/* ── Heading consistency — same feel everywhere ── */
+h1, h2, h3, h4, h5 {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Tighter tracking on large display text */
+h1 {
+  letter-spacing: -0.04em;
+  font-weight: 800;
 }

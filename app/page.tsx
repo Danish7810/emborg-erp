@@ -85,7 +85,7 @@ export default function Home() {
 
       <section style={{ padding: "60px 40px", maxWidth: "900px", margin: "0 auto", textAlign: "center" }} className="fade-up">
         <p style={{ fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--accent)", margin: "0 0 14px 0" }}>About EMBORG</p>
-        <h2 className="tight" style={{ fontSize: "28px", fontWeight: 700, color: "var(--ink)", margin: "0 0 16px 0", lineHeight: 1.3 }}>A simpler, more affordable alternative to enterprise ERP.</h2>
+        <h2 className="tight" style={{ fontSize: "34px", fontWeight: 800, color: "var(--ink)", margin: "0 0 16px 0", lineHeight: 1.1 }}>A simpler, more affordable alternative to enterprise ERP.</h2>
         <p style={{ fontSize: "16px", color: "var(--muted)", lineHeight: 1.6, maxWidth: "680px", margin: "0 auto" }}>
           EMBORG is a cloud ERP platform built for small and mid-sized businesses across retail, manufacturing,
           distribution, logistics, healthcare, and restaurants. Instead of stitching together spreadsheets and
