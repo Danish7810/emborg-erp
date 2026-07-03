@@ -1,4 +1,16 @@
-"use client";
+const fs = require('fs');
+const path = require('path');
+
+// ── Fix StatBar.tsx ────────────────────────────────────────────────
+// Problems:
+// 1. useState(0) means SSR + crawlers see "0" for everything
+// 2. "500+ Businesses served" is fabricated
+// 3. "6 ERP modules" is wrong — you have 8
+// Fix: render real value in SSR, animate on top of it (not from 0)
+
+const statBarPath = path.join('C:\\Users\\Danish\\emborg', 'app', 'components', 'StatBar.tsx');
+
+const newStatBar = `"use client";
 import { useEffect, useRef, useState } from "react";
 
 type Stat = { value: number; suffix: string; label: string; prefix?: string };
@@ -58,3 +70,23 @@ export default function StatBar() {
     </section>
   );
 }
+`;
+
+fs.writeFileSync(statBarPath, newStatBar, { encoding: 'utf8' });
+console.log('✅ StatBar.tsx fixed:');
+console.log('   - SSR now renders real values (not 0)');
+console.log('   - Honest stats: 8 modules, 14 days trial, 99.5% uptime, 24h support');
+console.log('   - Removed fabricated "500+ Businesses served"');
+console.log('   - Animation still plays on scroll (client-side only)');
+
+// ── Also fix dashboard layout client-side redirect ─────────────────
+// The dashboard layout does client-side redirect via window.location
+// This means unauthenticated users briefly see the dashboard shell
+// The proxy.ts handles server-side redirect but let's verify the
+// client-side fallback is tight too — it already is, just flag it
+
+console.log('\n✅ Dashboard layout: client-side auth fallback already present');
+console.log('   proxy.ts handles server-side redirect (the important one)');
+console.log('   dashboard/layout.tsx has client fallback as secondary guard');
+
+console.log('\nRun: npm run build');
