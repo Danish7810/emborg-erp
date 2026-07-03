@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     const inviteUrl = process.env.NEXT_PUBLIC_SITE_URL
       ? process.env.NEXT_PUBLIC_SITE_URL + "/auth/invite?token=" + invitation.token
-      : "https://emborgerp.com/auth/invite?token=" + invitation.token;
+      : "https://www.emborgerp.com/auth/invite?token=" + invitation.token;
 
     const html = `<!DOCTYPE html>
 <html>

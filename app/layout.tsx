@@ -9,7 +9,7 @@ export const metadata = {
   verification: { google: "6tVIHU-kIRIyYyZsMRd4FMq63YyYu-KT7iiwqcM3LP4" }, openGraph: {
     title: "EMBORG ERP - Simplifying Business Operations",
     description: "Run your entire business in one system. EMBORG unifies finance, inventory, CRM, HR, sales, and projects for growing SMEs.",
-    url: "https://emborgerp.com",
+    url: "https://www.emborgerp.com",
     siteName: "EMBORG",
     type: "website",
   },

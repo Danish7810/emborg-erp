@@ -23,9 +23,9 @@
 
           <div>
             <p style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--muted)", margin: "0 0 14px 0" }}>Company</p>
-            <a href="/" style={{ display: "block", fontSize: "14px", color: "var(--ink)", textDecoration: "none", marginBottom: "10px" }}>About</a>
-            <a href="/" style={{ display: "block", fontSize: "14px", color: "var(--ink)", textDecoration: "none", marginBottom: "10px" }}>Blog</a>
-            <a href="/" style={{ display: "block", fontSize: "14px", color: "var(--ink)", textDecoration: "none" }}>Careers</a>
+            <a href="/features" style={{ display: "block", fontSize: "14px", color: "var(--ink)", textDecoration: "none", marginBottom: "10px" }}>About</a>
+            <a href="/privacy" style={{ display: "block", fontSize: "14px", color: "var(--ink)", textDecoration: "none", marginBottom: "10px" }}>Privacy Policy</a>
+            <a href="/terms" style={{ display: "block", fontSize: "14px", color: "var(--ink)", textDecoration: "none" }}>Terms of Service</a><a href="/refund">Refund Policy</a>
           </div>
 
           <div>

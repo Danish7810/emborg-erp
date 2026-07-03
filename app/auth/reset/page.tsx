@@ -13,7 +13,7 @@ export default function ResetPage() {
     setLoading(true);
     setError("");
     const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: "https://emborgerp.com/auth/update-password" });
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: "https://www.emborgerp.com/auth/update-password" });
     if (error) { setError(error.message); setLoading(false); return; }
     setDone(true);
     setLoading(false);
