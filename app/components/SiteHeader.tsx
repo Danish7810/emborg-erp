@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Footer from "./Footer";
 import TawkChat from "./TawkChat";
 import { createClient } from "../lib/supabase";
@@ -25,6 +26,10 @@ export default function SiteHeader({ children }: { children: React.ReactNode }) 
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const pathname = usePathname();
+  // Dashboard and auth pages have their own complete layout/chrome —
+  // don't wrap them in the marketing header/footer/chat widget.
+  const hideMarketingChrome = pathname?.startsWith("/dashboard") || pathname?.startsWith("/auth");
 
   useEffect(() => {
     const saved = localStorage.getItem("emborg-theme");
@@ -41,6 +46,10 @@ export default function SiteHeader({ children }: { children: React.ReactNode }) 
     setDark(next);
     document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
     localStorage.setItem("emborg-theme", next ? "dark" : "light");
+  }
+
+  if (hideMarketingChrome) {
+    return <>{children}</>;
   }
 
   return (
