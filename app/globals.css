@@ -279,3 +279,11 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── THE missing rule: stack dashboard vertically on mobile so the
+   top bar sits ABOVE the content instead of beside it in a flex row ── */
+@media (max-width: 900px) {
+  .dashboard-shell {
+    flex-direction: column;
+  }
+}

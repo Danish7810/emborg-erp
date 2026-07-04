@@ -98,7 +98,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   );
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--bg)" }}>
+    <div className="dashboard-shell" style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--bg)" }}>
 
       {/* ── Mobile top bar — only visible below 768px ── */}
       <div className="dashboard-mobile-bar" style={{ display: "none" }}>
