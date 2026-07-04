@@ -106,6 +106,15 @@ export default function HRPage() {
   async function handleLeaveStatus(id: string, status: string) {
     const supabase = createClient();
     await supabase.from("leave_requests").update({ status }).eq("id", id);
+
+    // Fire-and-forget: email the employee that their leave was approved/rejected.
+    // Not awaited on purpose — don't block the UI refresh on email delivery.
+    fetch("/api/notify-leave-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ leaveRequestId: id }),
+    }).catch(() => { /* non-critical — silently ignore notification failures */ });
+
     fetchData();
   }
 

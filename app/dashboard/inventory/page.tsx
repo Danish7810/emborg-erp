@@ -42,14 +42,28 @@ export default function InventoryPage() {
     const supabase = createClient();
     const payload = { name, sku, category, quantity: parseInt(quantity) || 0, unit, price: parseFloat(price) || 0, low_stock_alert: parseInt(lowStock) || 10 };
 
+    let savedItemId: string | null = null;
+
     if (editing) {
       const { error: err } = await supabase.from("inventory").update(payload).eq("id", editing.id);
       if (err) { setError(err.message); setSaving(false); return; }
+      savedItemId = editing.id;
     } else {
       const { data: companyData, error: fnError } = await supabase.rpc("get_my_company_id");
       if (fnError || !companyData) { setError("Could not get company: " + (fnError?.message || "no company found")); setSaving(false); return; }
-      const { error: insertError } = await supabase.from("inventory").insert({ ...payload, company_id: companyData });
+      const { data: inserted, error: insertError } = await supabase.from("inventory").insert({ ...payload, company_id: companyData }).select("id").single();
       if (insertError) { setError(insertError.message); setSaving(false); return; }
+      savedItemId = inserted?.id ?? null;
+    }
+
+    // Fire-and-forget: check if this item is now at/below its low-stock threshold and notify admins.
+    // Not awaited on purpose — we don't want a slow email send to delay the UI.
+    if (savedItemId && payload.quantity <= payload.low_stock_alert) {
+      fetch("/api/notify-low-stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId: savedItemId }),
+      }).catch(() => { /* non-critical — silently ignore notification failures */ });
     }
 
     setShowForm(false);
