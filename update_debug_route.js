@@ -1,4 +1,7 @@
-import { NextResponse } from "next/server";
+const fs = require('fs');
+const path = require('path');
+
+const debugRoute = `import { NextResponse } from "next/server";
 
 function decodeJwtPayload(token: string) {
   try {
@@ -24,3 +27,12 @@ export async function GET() {
     cron_secret_present: cronSecret.length > 0,
   });
 }
+`;
+
+const debugPath = path.join('C:\\Users\\Danish\\emborg', 'app', 'api', 'debug-env', 'route.ts');
+fs.writeFileSync(debugPath, debugRoute, { encoding: 'utf8' });
+console.log('✅ Updated: app/api/debug-env/route.ts — now decodes the JWT role claim');
+console.log('   Expecting: service_key_role should say "service_role"');
+console.log('   If it says "anon" — that confirms the wrong key was copied');
+console.log('');
+console.log('Run: npm run build, git add/commit/push, then revisit the URL');
