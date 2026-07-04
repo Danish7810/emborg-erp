@@ -136,7 +136,7 @@ export default function DashboardPage() {
         </div>
         <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ position: "relative" }}>
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search contacts..." style={{ padding: "9px 14px", border: "1px solid var(--line)", borderRadius: "20px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "13px", width: "200px" }} />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search contacts..." style={{ padding: "9px 14px", border: "1px solid var(--line)", borderRadius: "20px", backgroundColor: "var(--bg)", color: "var(--ink)", fontSize: "13px", width: "100%", minWidth: "160px", maxWidth: "200px", boxSizing: "border-box" }} />
             {showSearch && searchResults.length > 0 && (
               <div style={{ position: "absolute", top: "100%", left: 0, right: 0, backgroundColor: "var(--bg)", border: "1px solid var(--line)", borderRadius: "12px", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", zIndex: 100, marginTop: "4px" }}>
                 {searchResults.slice(0, 5).map((c) => (
@@ -187,7 +187,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "16px" }}>
+      <div className="grid-2-1">
         <div style={{ padding: "20px", border: "1px solid var(--line)", borderRadius: "14px", backgroundColor: "var(--bg-alt)" }}>
           <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--ink)", margin: "0 0 16px 0" }}>Pipeline by Stage</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -227,7 +227,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
+      <div className="grid-3">
         <div style={{ padding: "20px", border: "1px solid var(--line)", borderRadius: "14px", backgroundColor: "var(--bg-alt)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
             <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--ink)", margin: 0 }}>Top Deals</h3>
@@ -312,7 +312,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+      <div className="grid-2">
         <div style={{ padding: "20px", border: "1px solid var(--line)", borderRadius: "14px", backgroundColor: "var(--bg-alt)" }}>
           <h3 style={{ fontSize: "15px", fontWeight: 700, color: "var(--ink)", margin: "0 0 14px 0" }}>Quick Stats</h3>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>

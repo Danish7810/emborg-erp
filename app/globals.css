@@ -254,3 +254,28 @@ h1 {
     overflow-x: hidden;
   }
 }
+
+/* ── Responsive multi-column grids — stack to 1 column on small screens ── */
+.grid-2-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .grid-2-1,
+  .grid-3,
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}

@@ -84,7 +84,7 @@ export default function PipelinePage() {
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+      <div className="grid-2" style={{ marginBottom: "16px" }}>
         <div style={cardStyle}>
           <h3 style={{ fontSize: "15px", fontWeight: 600, color: "var(--ink)", margin: "0 0 16px 0" }}>Conversion Funnel</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
