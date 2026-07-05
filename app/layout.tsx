@@ -9,6 +9,14 @@ export const metadata = {
     capable: true,
     statusBarStyle: "default",
     title: "EMBORG ERP",
+    startupImage: "/icons/apple-touch-icon.png",
+  },
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+    icon: [
+      { url: "/icons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192x192.png",  sizes: "192x192", type: "image/png" },
+    ],
   },
   formatDetection: { telephone: false },
   title: "EMBORG ERP - Simplifying Business Operations",
