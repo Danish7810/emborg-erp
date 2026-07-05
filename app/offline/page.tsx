@@ -1,3 +1,4 @@
+"use client";
 export default function OfflinePage() {
   return (
     <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "var(--bg)", fontFamily: "system-ui, sans-serif" }}>
