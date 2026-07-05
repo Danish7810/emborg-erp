@@ -1,8 +1,16 @@
 ﻿import "./globals.css";
+import PwaInit from "./components/PwaInit";
 import SiteHeader from "./components/SiteHeader";
 import PageWrapper from "./components/PageWrapper";
 
 export const metadata = {
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "EMBORG ERP",
+  },
+  formatDetection: { telephone: false },
   title: "EMBORG ERP - Simplifying Business Operations",
   description: "EMBORG is a modern cloud ERP platform for SMEs, unifying inventory, finance, CRM, HR, sales, and project management in one system.",
   keywords: "ERP software, SME ERP, cloud ERP, inventory management, CRM, HR payroll, business management platform",
@@ -18,7 +26,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
+      <body><PwaInit />
         <SiteHeader><PageWrapper>{children}</PageWrapper></SiteHeader>
       </body>
     </html>
