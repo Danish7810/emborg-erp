@@ -1,4 +1,7 @@
-import type { NextConfig } from "next";
+const fs = require('fs');
+const path = require('path');
+
+const config = `import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async headers() {
@@ -53,3 +56,14 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+`;
+
+fs.writeFileSync(path.join('C:\\Users\\Danish\\emborg', 'next.config.ts'), config, { encoding: 'utf8' });
+console.log('✅ next.config.ts: all 5 security headers added');
+console.log('   X-Frame-Options: SAMEORIGIN');
+console.log('   X-Content-Type-Options: nosniff');
+console.log('   Referrer-Policy: strict-origin-when-cross-origin');
+console.log('   Permissions-Policy: camera/mic/geo/cohort disabled');
+console.log('   Content-Security-Policy: full whitelist');
+console.log('');
+console.log('Run: npm run build');
