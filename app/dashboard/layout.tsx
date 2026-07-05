@@ -49,7 +49,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   const sections = [
-    { label: "Overview", items: [{ label: "Dashboard", href: "/dashboard" }, { label: "Getting Started", href: "/dashboard/onboarding" }, { label: "Import Data", href: "/dashboard/import" }, { label: "Usage Analytics", href: "/dashboard/usage" }] },
+    { label: "Overview", items: [{ label: "Dashboard", href: "/dashboard" }, { label: "Getting Started", href: "/dashboard/onboarding" }, { label: "Industry Setup", href: "/dashboard/setup" }, { label: "Import Data", href: "/dashboard/import" }, { label: "Usage Analytics", href: "/dashboard/usage" }] },
     { label: "CRM", items: [{ label: "Contacts", href: "/dashboard/contacts" }, { label: "Leads", href: "/dashboard/leads" }, { label: "Pipeline Analytics", href: "/dashboard/pipeline" }] },
     { label: "Operations", items: [{ label: "Inventory", href: "/dashboard/inventory" }, { label: "Finance", href: "/dashboard/finance" }, { label: "Reports", href: "/dashboard/reports" }, { label: "HR and Payroll", href: "/dashboard/hr" }, { label: "Team Settings", href: "/dashboard/settings" }] },
   ];

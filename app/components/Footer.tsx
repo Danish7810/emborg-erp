@@ -26,7 +26,8 @@ export default function Footer() {
             <p style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--muted)", margin: "0 0 14px 0" }}>Product</p>
             <a href="/features" style={{ display: "block", fontSize: "14px", color: "var(--ink)", textDecoration: "none", marginBottom: "10px" }}>Features</a>
             <a href="/pricing" style={{ display: "block", fontSize: "14px", color: "var(--ink)", textDecoration: "none", marginBottom: "10px" }}>Pricing</a>
-            <a href="/blog" style={{ display: "block", fontSize: "14px", color: "var(--ink)", textDecoration: "none" }}>Blog</a>
+            <a href="/blog" style={{ display: "block", fontSize: "14px", color: "var(--ink)", textDecoration: "none", marginBottom: "10px" }}>Blog</a>
+            <a href="/marketplace" style={{ display: "block", fontSize: "14px", color: "var(--ink)", textDecoration: "none" }}>Marketplace</a>
           </div>
 
           {/* Company */}
