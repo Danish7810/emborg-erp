@@ -94,7 +94,7 @@ export const INDUSTRY_TEMPLATES: IndustryTemplate[] = [
       { title: "Brand identity project — Startup client", value: 45000, status: "new" },
     ],
     sampleInventory: [
-      { name: "MacBook Pro 14"", sku: "HW-MBP-001", category: "Hardware & Equipment", quantity: 5, price: 185000, low_stock_alert: 1, unit: "pcs" },
+      { name: "MacBook Pro 14 inch", sku: "HW-MBP-001", category: "Hardware & Equipment", quantity: 5, price: 185000, low_stock_alert: 1, unit: "pcs" },
       { name: "Adobe Creative Cloud (Annual)", sku: "SW-ADO-001", category: "Software Licenses", quantity: 3, price: 54000, low_stock_alert: 1, unit: "license" },
       { name: "Notebook (Premium)", sku: "OFF-NB-001", category: "Office Supplies", quantity: 25, price: 120, low_stock_alert: 5, unit: "pcs" },
     ],
