@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { createClient } from "../lib/supabase";
@@ -20,7 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Close the mobile drawer automatically whenever the route changes
   useEffect(() => { setMobileOpen(false); }, [pathname]);
 
-  // Usage tracking — fire-and-forget log of which page was visited.
+  // Usage tracking â€” fire-and-forget log of which page was visited.
   // Silently no-ops if it fails; never blocks the UI.
   useEffect(() => {
     async function logUsage() {
@@ -36,7 +36,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           page: pathname,
         });
       } catch {
-        // non-critical — ignore
+        // non-critical â€” ignore
       }
     }
     logUsage();
@@ -50,7 +50,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const sections = [
     { label: "Overview", items: [{ label: "Dashboard", href: "/dashboard" }, { label: "Getting Started", href: "/dashboard/onboarding" }, { label: "Industry Setup", href: "/dashboard/setup" }, { label: "Import Data", href: "/dashboard/import" }, { label: "Usage Analytics", href: "/dashboard/usage" }] },
-    { label: "CRM", items: [{ label: "Contacts", href: "/dashboard/contacts" }, { label: "Leads", href: "/dashboard/leads" }, { label: "Pipeline Analytics", href: "/dashboard/pipeline" }] },
+    { label: "CRM", items: [{ label: "Contacts", href: "/dashboard/contacts" }, { label: "Leads", href: "/dashboard/leads" }, { label: "Pipeline Analytics", href: "/dashboard/pipeline" }, { label: "Quotations", href: "/dashboard/quotations" }] },
     { label: "Operations", items: [{ label: "Inventory", href: "/dashboard/inventory" }, { label: "Finance", href: "/dashboard/finance" }, { label: "Reports", href: "/dashboard/reports" }, { label: "HR and Payroll", href: "/dashboard/hr" }, { label: "Team Settings", href: "/dashboard/settings" }] },
   ];
 
@@ -61,7 +61,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <img src="/brand/logo.svg" alt="EMBORG" width="22" height="22" />
           <span className="tight" style={{ fontSize: "15px", fontWeight: 700, color: "var(--ink)" }}>EMBORG</span>
         </div>
-        {/* Close button — mobile only */}
+        {/* Close button â€” mobile only */}
         <button
           onClick={() => setMobileOpen(false)}
           className="dashboard-mobile-close"
@@ -100,7 +100,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="dashboard-shell" style={{ display: "flex", minHeight: "100vh", backgroundColor: "var(--bg)" }}>
 
-      {/* ── Mobile top bar — only visible below 768px ── */}
+      {/* â”€â”€ Mobile top bar â€” only visible below 768px â”€â”€ */}
       <div className="dashboard-mobile-bar" style={{ display: "none" }}>
         <button onClick={() => setMobileOpen(true)} aria-label="Open menu" style={{ background: "none", border: "none", cursor: "pointer", padding: "6px" }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -114,7 +114,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div style={{ width: "24px" }} />
       </div>
 
-      {/* ── Overlay backdrop — mobile only, shown when drawer is open ── */}
+      {/* â”€â”€ Overlay backdrop â€” mobile only, shown when drawer is open â”€â”€ */}
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
@@ -123,7 +123,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         />
       )}
 
-      {/* ── Sidebar — fixed on desktop, slide-in drawer on mobile ── */}
+      {/* â”€â”€ Sidebar â€” fixed on desktop, slide-in drawer on mobile â”€â”€ */}
       <aside className={mobileOpen ? "dashboard-sidebar open" : "dashboard-sidebar"} style={{ width: "220px", borderRight: "1px solid var(--line)", padding: "20px 12px", display: "flex", flexDirection: "column", flexShrink: 0, backgroundColor: "var(--bg)" }}>
         {sidebarContent}
       </aside>
@@ -135,3 +135,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+
