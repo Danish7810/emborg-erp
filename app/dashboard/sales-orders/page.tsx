@@ -125,6 +125,9 @@ export default function SalesOrdersPage() {
       const { data: created, error } = await supabase.from("sales_orders").insert({ ...payload, number }).select().single();
       if (error || !created) { showToast("Failed to save sales order", false); setSaving(false); return; }
       soId = created.id;
+      if (fromQuotationId) {
+        await supabase.from("quotations").update({ status: "converted" }).eq("id", fromQuotationId);
+      }
     }
 
     const validItems = items.filter(it => it.item_name.trim());

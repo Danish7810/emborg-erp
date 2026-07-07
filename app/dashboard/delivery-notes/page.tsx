@@ -147,6 +147,9 @@ export default function DeliveryNotesPage() {
       if (!item.inventory_id) continue;
       const { data: invItem } = await supabase.from("inventory").select("quantity").eq("id", item.inventory_id).single();
       const currentQty = invItem?.quantity || 0;
+      if (item.qty > currentQty) {
+        showToast("Warning: dispatching " + item.qty + " but only " + currentQty + " in stock for " + item.item_name, false);
+      }
       const newBalance = Math.max(0, currentQty - item.qty);
       await supabase.from("inventory").update({ quantity: newBalance }).eq("id", item.inventory_id);
       await supabase.from("stock_ledger_entries").insert({

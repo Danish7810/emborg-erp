@@ -146,7 +146,12 @@ export default function PurchaseOrdersPage() {
 
     let allReceived = true;
     for (const item of poItems) {
-      const receiveNow = receiveQtys[item.id] || 0;
+      const remaining = item.qty - (item.received_qty || 0);
+      let receiveNow = receiveQtys[item.id] || 0;
+      if (receiveNow > remaining) {
+        showToast("Capped receipt for " + item.item_name + " to remaining qty (" + remaining + ")", false);
+        receiveNow = remaining;
+      }
       if (receiveNow <= 0) { if ((item.received_qty || 0) < item.qty) allReceived = false; continue; }
 
       const newReceivedQty = (item.received_qty || 0) + receiveNow;
