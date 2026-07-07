@@ -194,7 +194,7 @@ export default function SalesOrdersPage() {
     const invNumber = so.number.replace("SO", "INV");
     const { error } = await supabase.from("invoices").insert({
       invoice_number: invNumber, client_name: so.customer_name, amount: so.total,
-      status: "pending", due_date: so.delivery_date || null, company_id: profile.company_id,
+      status: "sent", due_date: so.delivery_date || null, company_id: profile.company_id,
     });
     if (error) { showToast("Failed to create invoice: " + error.message, false); return; }
     await supabase.from("sales_orders").update({ invoiced: true }).eq("id", so.id);
