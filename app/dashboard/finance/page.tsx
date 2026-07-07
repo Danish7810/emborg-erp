@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "../../lib/supabase";
 
-type Invoice = { id: string; number: string; client: string; amount: number; status: string; due_date: string; created_at: string; };
+type Invoice = { id: string; invoice_number: string; client_name: string; amount: number; status: string; due_date: string; created_at: string; };
 type Expense = { id: string; description: string; amount: number; category: string; date: string; };
 
 declare global { interface Window { Razorpay: any; } }
@@ -61,8 +61,8 @@ export default function FinancePage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          invoiceNumber: inv.number,
-          client: inv.client,
+          invoiceNumber: inv.invoice_number,
+          client: inv.client_name,
           amount: inv.amount,
           dueDate: inv.due_date,
           status: inv.status,
@@ -82,7 +82,7 @@ export default function FinancePage() {
       amount: Math.round(invoice.amount * 100),
       currency: "INR",
       name: "EMBORG",
-      description: "Invoice " + invoice.number + " - " + invoice.client,
+      description: "Invoice " + invoice.invoice_number + " - " + invoice.client_name,
       image: "/brand/logo.svg",
       handler: async function(response: any) {
         const supabase = createClient();
@@ -90,7 +90,7 @@ export default function FinancePage() {
         showToast("Payment successful! ID: " + response.razorpay_payment_id, true);
         fetchData();
       },
-      prefill: { name: invoice.client },
+      prefill: { name: invoice.client_name },
       theme: { color: "#6366F1" },
     };
     const rzp = new window.Razorpay(options);
@@ -225,8 +225,8 @@ export default function FinancePage() {
                     <tr><td colSpan={6} style={{ padding: "24px", textAlign: "center", color: "var(--muted)" }}>No invoices yet. Create your first one!</td></tr>
                   ) : invoices.map(inv => (
                     <tr key={inv.id} style={{ borderBottom: "1px solid var(--line)" }}>
-                      <td style={{ padding: "12px", fontWeight: 600, color: "var(--ink)" }}>{inv.number}</td>
-                      <td style={{ padding: "12px", color: "var(--ink)" }}>{inv.client}</td>
+                      <td style={{ padding: "12px", fontWeight: 600, color: "var(--ink)" }}>{inv.invoice_number}</td>
+                      <td style={{ padding: "12px", color: "var(--ink)" }}>{inv.client_name}</td>
                       <td style={{ padding: "12px", fontWeight: 600, color: "var(--ink)" }}>INR {(inv.amount || 0).toLocaleString()}</td>
                       <td style={{ padding: "12px", color: "var(--muted)" }}>{inv.due_date ? new Date(inv.due_date).toLocaleDateString() : "-"}</td>
                       <td style={{ padding: "12px" }}>
