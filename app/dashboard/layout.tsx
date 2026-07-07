@@ -51,7 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const sections = [
     { label: "Overview", items: [{ label: "Dashboard", href: "/dashboard" }, { label: "Getting Started", href: "/dashboard/onboarding" }, { label: "Industry Setup", href: "/dashboard/setup" }, { label: "Import Data", href: "/dashboard/import" }, { label: "Usage Analytics", href: "/dashboard/usage" }] },
     { label: "CRM", items: [{ label: "Contacts", href: "/dashboard/contacts" }, { label: "Leads", href: "/dashboard/leads" }, { label: "Pipeline Analytics", href: "/dashboard/pipeline" }, { label: "Quotations", href: "/dashboard/quotations" }, { label: "Sales Orders", href: "/dashboard/sales-orders" }] },
-    { label: "Operations", items: [{ label: "Suppliers", href: "/dashboard/suppliers" }, { label: "Purchase Orders", href: "/dashboard/purchase-orders" }, { label: "Delivery Notes", href: "/dashboard/delivery-notes" }, { label: "Stock Ledger", href: "/dashboard/stock-ledger" }, { label: "Inventory", href: "/dashboard/inventory" }, { label: "Finance", href: "/dashboard/finance" }, { label: "Payment Entries", href: "/dashboard/payments" }, { label: "Reports", href: "/dashboard/reports" }, { label: "HR and Payroll", href: "/dashboard/hr" }, { label: "Team Settings", href: "/dashboard/settings" }] },
+    { label: "Operations", items: [{ label: "Suppliers", href: "/dashboard/suppliers" }, { label: "Purchase Orders", href: "/dashboard/purchase-orders" }, { label: "Delivery Notes", href: "/dashboard/delivery-notes" }, { label: "Stock Ledger", href: "/dashboard/stock-ledger" }, { label: "Inventory", href: "/dashboard/inventory" }, { label: "Finance", href: "/dashboard/finance" }, { label: "Payment Entries", href: "/dashboard/payments" }, { label: "Journal Entries", href: "/dashboard/journal-entries" }, { label: "Reports", href: "/dashboard/reports" }, { label: "HR and Payroll", href: "/dashboard/hr" }, { label: "Team Settings", href: "/dashboard/settings" }] },
   ];
 
   const sidebarContent = (
@@ -135,6 +135,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+
 
 
 
