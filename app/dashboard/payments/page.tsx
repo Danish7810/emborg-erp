@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "../../lib/supabase";
 
-type Invoice = { id: string; number: string; client: string; amount: number; status: string; };
+type Invoice = { id: string; invoice_number: string; client_name: string; amount: number; status: string; };
 type Payment = { id: string; invoice_id: string; invoice_number: string; amount: number; payment_method: string; reference_number: string; payment_date: string; notes: string; created_at: string; };
 
 const METHOD_LABELS: Record<string, string> = { razorpay: "Razorpay", cash: "Cash", bank_transfer: "Bank Transfer", cheque: "Cheque" };
@@ -31,7 +31,7 @@ export default function PaymentEntriesPage() {
     const supabase = createClient();
     const [payRes, invRes] = await Promise.all([
       supabase.from("payment_entries").select("*").order("created_at", { ascending: false }),
-      supabase.from("invoices").select("id, number, client, amount, status").neq("status", "draft").order("number"),
+      supabase.from("invoices").select("id, invoice_number, client_name, amount, status").order("invoice_number"),
     ]);
     setPayments(payRes.data || []);
     setInvoices(invRes.data || []);
@@ -69,7 +69,7 @@ export default function PaymentEntriesPage() {
     if (!profile?.company_id) { setSaving(false); return; }
 
     await supabase.from("payment_entries").insert({
-      company_id: profile.company_id, invoice_id: selectedInvoiceId, invoice_number: inv.number,
+      company_id: profile.company_id, invoice_id: selectedInvoiceId, invoice_number: inv.invoice_number,
       amount: amt, payment_method: method, reference_number: reference || null,
       payment_date: paymentDate || null, notes: notes || null,
     });
@@ -135,7 +135,7 @@ export default function PaymentEntriesPage() {
             <select value={selectedInvoiceId} onChange={e => setSelectedInvoiceId(e.target.value)} required style={inputStyle}>
               <option value="">Select invoice</option>
               {invoices.filter(inv => getBalance(inv) > 0).map(inv => (
-                <option key={inv.id} value={inv.id}>{inv.number} - {inv.client} (balance: INR {getBalance(inv).toLocaleString()})</option>
+                <option key={inv.id} value={inv.id}>{inv.invoice_number} - {inv.client_name} (balance: INR {getBalance(inv).toLocaleString()})</option>
               ))}
             </select>
             <input type="number" min="0" step="any" placeholder="Amount (INR)" value={amount} onChange={e => setAmount(e.target.value)} required style={inputStyle} />
@@ -175,7 +175,7 @@ export default function PaymentEntriesPage() {
               return (
                 <div key={inv.id} style={{ padding: "12px 16px", backgroundColor: "var(--bg)", borderRadius: "10px", border: "1px solid var(--line)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-                    <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)" }}>{inv.number} - {inv.client}</span>
+                    <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink)" }}>{inv.invoice_number} - {inv.client_name}</span>
                     <span style={{ fontSize: "12px", color: "var(--muted)" }}>{pct}% paid</span>
                   </div>
                   <div style={{ height: "6px", backgroundColor: "var(--line)", borderRadius: "3px", overflow: "hidden", marginBottom: "6px" }}>
