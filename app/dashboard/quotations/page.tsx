@@ -2,12 +2,13 @@
 import { useEffect, useState } from "react";
 import { createClient } from "../../lib/supabase";
 
-type QuotationItem = { id?: string; item_name: string; description: string; qty: number; rate: number; amount: number; };
+type QuotationItem = { id?: string; item_name: string; description: string; qty: number; rate: number; amount: number; inventory_id: string; };
 type Quotation = {
   id: string; number: string; customer_name: string; quote_date: string; valid_till: string;
   status: string; subtotal: number; discount_percent: number; tax_percent: number; total: number;
   terms: string; created_at: string;
 };
+type InvItem = { id: string; name: string; quantity: number; unit: string; };
 
 const STATUS_COLORS: Record<string, string> = {
   draft: "#6B7280", sent: "#3B82F6", accepted: "#10B981",
@@ -15,11 +16,12 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 function emptyItem(): QuotationItem {
-  return { item_name: "", description: "", qty: 1, rate: 0, amount: 0 };
+  return { item_name: "", description: "", qty: 1, rate: 0, amount: 0, inventory_id: "" };
 }
 
 export default function QuotationsPage() {
   const [quotations, setQuotations] = useState<Quotation[]>([]);
+  const [invItems, setInvItems] = useState<InvItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Quotation | null>(null);
@@ -45,8 +47,12 @@ export default function QuotationsPage() {
 
   async function fetchQuotations() {
     const supabase = createClient();
-    const { data } = await supabase.from("quotations").select("*").order("created_at", { ascending: false });
-    setQuotations(data || []);
+    const [quotesRes, invRes] = await Promise.all([
+      supabase.from("quotations").select("*").order("created_at", { ascending: false }),
+      supabase.from("inventory").select("id, name, quantity, unit").order("name"),
+    ]);
+    setQuotations(quotesRes.data || []);
+    setInvItems(invRes.data || []);
     setLoading(false);
   }
 
@@ -60,6 +66,10 @@ export default function QuotationsPage() {
   function updateItem(idx: number, field: keyof QuotationItem, value: any) {
     const next = [...items];
     (next[idx] as any)[field] = value;
+    if (field === "inventory_id" && value) {
+      const inv = invItems.find(i => i.id === value);
+      if (inv) next[idx].item_name = inv.name;
+    }
     next[idx].amount = (next[idx].qty || 0) * (next[idx].rate || 0);
     setItems(next);
   }
@@ -116,6 +126,7 @@ export default function QuotationsPage() {
         validItems.map((it, i) => ({
           quotation_id: quotationId, item_name: it.item_name, description: it.description,
           qty: it.qty, rate: it.rate, amount: it.qty * it.rate, sort_order: i,
+          inventory_id: it.inventory_id || null,
         }))
       );
     }
@@ -260,13 +271,17 @@ export default function QuotationsPage() {
 
           {/* Line items - ERPNext style child table */}
           <div style={{ marginBottom: "16px" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 2fr 70px 110px 110px 32px", gap: "8px", marginBottom: "6px", padding: "0 4px" }}>
-              {["Item", "Description", "Qty", "Rate (INR)", "Amount", ""].map(h => (
+            <div style={{ display: "grid", gridTemplateColumns: "150px 2fr 2fr 70px 110px 110px 32px", gap: "8px", marginBottom: "6px", padding: "0 4px" }}>
+              {["Catalog Link", "Item", "Description", "Qty", "Rate (INR)", "Amount", ""].map(h => (
                 <span key={h} style={{ fontSize: "11px", fontWeight: 700, color: "var(--muted)", textTransform: "uppercase" }}>{h}</span>
               ))}
             </div>
             {items.map((it, i) => (
-              <div key={i} style={{ display: "grid", gridTemplateColumns: "2fr 2fr 70px 110px 110px 32px", gap: "8px", marginBottom: "8px" }}>
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "150px 2fr 2fr 70px 110px 110px 32px", gap: "8px", marginBottom: "8px" }}>
+                <select value={it.inventory_id} onChange={e => updateItem(i, "inventory_id", e.target.value)} style={inputStyle} title="Optionally link to an inventory item">
+                  <option value="">Custom item</option>
+                  {invItems.map(inv => <option key={inv.id} value={inv.id}>{inv.name} (stock: {inv.quantity} {inv.unit})</option>)}
+                </select>
                 <input placeholder="Item name" value={it.item_name} onChange={e => updateItem(i, "item_name", e.target.value)} style={inputStyle} />
                 <input placeholder="Description" value={it.description} onChange={e => updateItem(i, "description", e.target.value)} style={inputStyle} />
                 <input type="number" min="0" step="any" value={it.qty} onChange={e => updateItem(i, "qty", parseFloat(e.target.value) || 0)} style={inputStyle} />
