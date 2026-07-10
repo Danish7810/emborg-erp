@@ -3,8 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { renderEmborgEmail } from "../../../lib/emailTemplate";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 // Service-role client — this route has no logged-in user (it's a cron job),
 // so it must use the service key and scope everything manually by company_id.
 const supabase = createClient(
@@ -23,6 +21,11 @@ export async function GET(req: NextRequest) {
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  if (!process.env.RESEND_API_KEY) {
+    return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
+  }
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
