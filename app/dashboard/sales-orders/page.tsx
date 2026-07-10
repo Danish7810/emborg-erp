@@ -15,6 +15,13 @@ const STATUS_COLORS: Record<string, string> = {
   draft: "#6B7280", confirmed: "#3B82F6", in_progress: "#F59E0B", completed: "#10B981", cancelled: "#EF4444",
 };
 
+// Statuses at which a Sales Order's items should be holding a stock
+// reservation. Any transition that crosses this boundary (in either
+// direction) reserves or releases stock accordingly -- see handleSave
+// and handleStatusChange.
+const RESERVED_STATUSES = new Set(["confirmed", "in_progress", "completed"]);
+function needsReservation(status: string) { return RESERVED_STATUSES.has(status); }
+
 function emptyItem(): SOItem { return { item_name: "", description: "", qty: 1, delivered_qty: 0, rate: 0, amount: 0, inventory_id: "" }; }
 
 export default function SalesOrdersPage() {
@@ -29,6 +36,7 @@ export default function SalesOrdersPage() {
   const [fulfillingId, setFulfillingId] = useState<string | null>(null);
   const [deliverQtys, setDeliverQtys] = useState<Record<string, number>>({});
   const [fulfillSaving, setFulfillSaving] = useState(false);
+  const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
 
   const [fromQuotationId, setFromQuotationId] = useState("");
   const [customerName, setCustomerName] = useState("");
@@ -127,6 +135,13 @@ export default function SalesOrdersPage() {
 
     let soId = editing?.id;
     if (editing) {
+      // Release any reservations held against the item set we're about to
+      // replace, so nothing outlives the sales_order_items rows it was
+      // reserved against. Fresh reservations are created below, against
+      // the new item set, if the saved status still calls for them.
+      if (needsReservation(editing.status)) {
+        await supabase.rpc("release_sales_order_reservations", { p_sales_order_id: editing.id });
+      }
       await supabase.from("sales_orders").update(payload).eq("id", editing.id);
       await supabase.from("sales_order_items").delete().eq("sales_order_id", editing.id);
     } else {
@@ -140,14 +155,34 @@ export default function SalesOrdersPage() {
     }
 
     const validItems = items.filter(it => it.item_name.trim());
+    let insertedItems: { id: string; inventory_id: string | null; qty: number }[] | null = null;
     if (validItems.length && soId) {
-      await supabase.from("sales_order_items").insert(
+      const { data } = await supabase.from("sales_order_items").insert(
         validItems.map((it, i) => ({
           sales_order_id: soId, item_name: it.item_name, description: it.description,
           qty: it.qty, delivered_qty: it.delivered_qty || 0, rate: it.rate, amount: it.qty * it.rate, sort_order: i,
           inventory_id: it.inventory_id || null,
         }))
-      );
+      ).select("id, inventory_id, qty");
+      insertedItems = data;
+    }
+
+    // Reserve stock for the saved item set if the saved status calls for
+    // it (covers both "confirmed at creation" and "still confirmed after
+    // an edit" -- reserve_stock_item() is idempotent, so this is safe to
+    // call even if a reservation for a given item already exists).
+    if (needsReservation(status) && insertedItems && soId) {
+      for (const it of insertedItems) {
+        if (it.inventory_id) {
+          await supabase.rpc("reserve_stock_item", {
+            p_sales_order_item_id: it.id,
+            p_sales_order_id: soId,
+            p_inventory_id: it.inventory_id,
+            p_qty: it.qty,
+            p_company_id: profile.company_id,
+          });
+        }
+      }
     }
 
     setShowForm(false); setSaving(false);
@@ -163,8 +198,36 @@ export default function SalesOrdersPage() {
   }
 
   async function handleStatusChange(id: string, newStatus: string) {
+    if (statusUpdatingId) return;
+    const so = orders.find(o => o.id === id);
+    if (!so) return;
+    setStatusUpdatingId(id);
     const supabase = createClient();
+
+    const wasReserved = needsReservation(so.status);
+    const willBeReserved = needsReservation(newStatus);
+
+    if (willBeReserved && !wasReserved) {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", user!.id).single();
+      const { data: soItems } = await supabase.from("sales_order_items").select("id, inventory_id, qty").eq("sales_order_id", id);
+      for (const it of soItems || []) {
+        if (it.inventory_id) {
+          await supabase.rpc("reserve_stock_item", {
+            p_sales_order_item_id: it.id,
+            p_sales_order_id: id,
+            p_inventory_id: it.inventory_id,
+            p_qty: it.qty,
+            p_company_id: profile?.company_id,
+          });
+        }
+      }
+    } else if (!willBeReserved && wasReserved) {
+      await supabase.rpc("release_sales_order_reservations", { p_sales_order_id: id });
+    }
+
     await supabase.from("sales_orders").update({ status: newStatus }).eq("id", id);
+    setStatusUpdatingId(null);
     fetchAll();
   }
 
@@ -319,7 +382,7 @@ export default function SalesOrdersPage() {
                   <td style={{ padding: "12px", color: "var(--muted)" }}>{so.delivery_date ? new Date(so.delivery_date).toLocaleDateString() : "-"}</td>
                   <td style={{ padding: "12px", fontWeight: 700, color: "var(--ink)" }}>INR {(so.total || 0).toLocaleString()}</td>
                   <td style={{ padding: "12px" }}>
-                    <select value={so.status} onChange={e => handleStatusChange(so.id, e.target.value)} style={{ padding: "4px 8px", borderRadius: "8px", fontSize: "11px", fontWeight: 700, border: "1px solid " + (STATUS_COLORS[so.status] || "#6B7280"), backgroundColor: (STATUS_COLORS[so.status] || "#6B7280") + "22", color: STATUS_COLORS[so.status] || "#6B7280" }}>
+                    <select value={so.status} onChange={e => handleStatusChange(so.id, e.target.value)} disabled={statusUpdatingId === so.id} style={{ padding: "4px 8px", borderRadius: "8px", fontSize: "11px", fontWeight: 700, border: "1px solid " + (STATUS_COLORS[so.status] || "#6B7280"), backgroundColor: (STATUS_COLORS[so.status] || "#6B7280") + "22", color: STATUS_COLORS[so.status] || "#6B7280" }}>
                       {["draft", "confirmed", "in_progress", "completed", "cancelled"].map(s => <option key={s} value={s}>{s.replace("_", " ").toUpperCase()}</option>)}
                     </select>
                   </td>
