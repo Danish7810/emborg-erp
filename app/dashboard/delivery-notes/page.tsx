@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "../../lib/supabase";
 
-type DNItem = { id?: string; item_name: string; inventory_id: string; qty: number; };
+type DNItem = { id?: string; item_name: string; inventory_id: string; qty: number; sales_order_item_id: string };
 type DeliveryNote = {
   id: string; number: string; sales_order_id: string; customer_name: string; delivery_date: string;
   status: string; vehicle_number: string; driver_name: string; notes: string; created_at: string;
@@ -14,7 +14,7 @@ const STATUS_COLORS: Record<string, string> = {
   draft: "#6B7280", dispatched: "#F59E0B", delivered: "#10B981", returned: "#EF4444", cancelled: "#EF4444",
 };
 
-function emptyItem(): DNItem { return { item_name: "", inventory_id: "", qty: 1 }; }
+function emptyItem(): DNItem { return { item_name: "", inventory_id: "", qty: 1, sales_order_item_id: "" }; }
 
 export default function DeliveryNotesPage() {
   const [notes, setNotes] = useState<DeliveryNote[]>([]);
@@ -59,6 +59,11 @@ export default function DeliveryNotesPage() {
     if (field === "inventory_id") {
       const inv = invItems.find(i => i.id === value);
       if (inv) next[idx].item_name = inv.name;
+      // Manually changing the product breaks this line's link back to
+      // whichever Sales Order item it may have been loaded from -- the
+      // delivered_qty it would otherwise credit no longer describes the
+      // same product.
+      next[idx].sales_order_item_id = "";
     }
     setItems(next);
   }
@@ -79,7 +84,7 @@ export default function DeliveryNotesPage() {
     const supabase = createClient();
     const { data } = await supabase.from("sales_order_items").select("*").eq("sales_order_id", soId).order("sort_order");
     if (data && data.length) {
-      setItems(data.map((it: any) => ({ item_name: it.item_name, inventory_id: it.inventory_id || "", qty: it.qty - (it.delivered_qty || 0) })).filter((it: DNItem) => it.qty > 0));
+      setItems(data.map((it: any) => ({ item_name: it.item_name, inventory_id: it.inventory_id || "", qty: it.qty - (it.delivered_qty || 0), sales_order_item_id: it.id })).filter((it: DNItem) => it.qty > 0));
     }
   }
 
@@ -120,7 +125,7 @@ export default function DeliveryNotesPage() {
     const validItems = items.filter(it => it.item_name.trim());
     if (validItems.length && dnId) {
       await supabase.from("delivery_note_items").insert(
-        validItems.map((it, i) => ({ delivery_note_id: dnId, item_name: it.item_name, inventory_id: it.inventory_id || null, qty: it.qty, sort_order: i }))
+        validItems.map((it, i) => ({ delivery_note_id: dnId, item_name: it.item_name, inventory_id: it.inventory_id || null, qty: it.qty, sort_order: i, sales_order_item_id: it.sales_order_item_id || null }))
       );
     }
 
@@ -156,32 +161,23 @@ export default function DeliveryNotesPage() {
       if (item.qty > currentQty) {
         showToast("Warning: dispatching " + item.qty + " but only " + currentQty + " in stock for " + item.item_name, false);
       }
-      const { data: rpcData, error: rpcError } = await supabase.rpc("record_stock_movement", {
+      // One atomic call: inventory + ledger + reservation consumption +
+      // delivered_qty + sales order status roll-up, all inside a single
+      // Postgres transaction (dispatch_stock_for_line composes the
+      // Phase 2a/2B RPCs internally rather than duplicating their logic).
+      const { error: rpcError } = await supabase.rpc("dispatch_stock_for_line", {
         p_inventory_id: item.inventory_id,
-        p_delta: -item.qty,
-        p_entry_type: "sale",
+        p_qty: item.qty,
         p_item_name: item.item_name,
         p_company_id: profile?.company_id,
-        p_reference_type: "delivery_note",
         p_reference_id: dn.id,
         p_notes: "Dispatched via " + dn.number,
-        p_clamp_to_available: true,
+        p_sales_order_id: dn.sales_order_id || null,
+        p_sales_order_item_id: item.sales_order_item_id || null,
       });
       if (rpcError) {
         showToast("Failed to record stock for " + item.item_name + ": " + rpcError.message, false);
         continue;
-      }
-
-      // Consume only what was actually deducted (may be less than
-      // item.qty if the RPC had to clamp to available stock), against
-      // the reservation this delivery note's own sales order is holding.
-      if (dn.sales_order_id) {
-        const appliedDelta = Math.abs(rpcData?.[0]?.applied_delta ?? item.qty);
-        await supabase.rpc("consume_reservation", {
-          p_sales_order_id: dn.sales_order_id,
-          p_inventory_id: item.inventory_id,
-          p_qty: appliedDelta,
-        });
       }
     }
 

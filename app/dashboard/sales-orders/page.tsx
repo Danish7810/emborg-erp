@@ -33,9 +33,6 @@ export default function SalesOrdersPage() {
   const [editing, setEditing] = useState<SalesOrder | null>(null);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
-  const [fulfillingId, setFulfillingId] = useState<string | null>(null);
-  const [deliverQtys, setDeliverQtys] = useState<Record<string, number>>({});
-  const [fulfillSaving, setFulfillSaving] = useState(false);
   const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
 
   const [fromQuotationId, setFromQuotationId] = useState("");
@@ -198,6 +195,15 @@ export default function SalesOrdersPage() {
   }
 
   async function handleStatusChange(id: string, newStatus: string) {
+    // in_progress/completed are now derived exclusively from Delivery Note
+    // dispatches (dispatch_stock_for_line rolls this up automatically) --
+    // no longer an independent manual update. The status dropdown's
+    // options for these two are disabled to prevent this via the UI; this
+    // is a defensive backstop against any other caller.
+    if (newStatus === "in_progress" || newStatus === "completed") {
+      showToast("Fulfillment status is set automatically from Delivery Note dispatches.", false);
+      return;
+    }
     if (statusUpdatingId) return;
     const so = orders.find(o => o.id === id);
     if (!so) return;
@@ -228,37 +234,6 @@ export default function SalesOrdersPage() {
 
     await supabase.from("sales_orders").update({ status: newStatus }).eq("id", id);
     setStatusUpdatingId(null);
-    fetchAll();
-  }
-
-  async function openFulfill(so: SalesOrder) {
-    const supabase = createClient();
-    const { data } = await supabase.from("sales_order_items").select("*").eq("sales_order_id", so.id);
-    const qtys: Record<string, number> = {};
-    (data || []).forEach((it: any) => { qtys[it.id] = it.qty - (it.delivered_qty || 0); });
-    setDeliverQtys(qtys);
-    setFulfillingId(so.id);
-  }
-
-  async function confirmFulfill(so: SalesOrder) {
-    if (fulfillSaving) return;
-    setFulfillSaving(true);
-    const supabase = createClient();
-    const { data: soItems } = await supabase.from("sales_order_items").select("*").eq("sales_order_id", so.id);
-    if (!soItems) { setFulfillSaving(false); return; }
-
-    let allDelivered = true;
-    for (const item of soItems) {
-      const deliverNow = deliverQtys[item.id] || 0;
-      const newDelivered = (item.delivered_qty || 0) + deliverNow;
-      if (deliverNow > 0) await supabase.from("sales_order_items").update({ delivered_qty: newDelivered }).eq("id", item.id);
-      if (newDelivered < item.qty) allDelivered = false;
-    }
-
-    await supabase.from("sales_orders").update({ status: allDelivered ? "completed" : "in_progress" }).eq("id", so.id);
-    setFulfillingId(null);
-    setFulfillSaving(false);
-    showToast("Fulfillment updated!", true);
     fetchAll();
   }
 
@@ -382,14 +357,13 @@ export default function SalesOrdersPage() {
                   <td style={{ padding: "12px", color: "var(--muted)" }}>{so.delivery_date ? new Date(so.delivery_date).toLocaleDateString() : "-"}</td>
                   <td style={{ padding: "12px", fontWeight: 700, color: "var(--ink)" }}>INR {(so.total || 0).toLocaleString()}</td>
                   <td style={{ padding: "12px" }}>
-                    <select value={so.status} onChange={e => handleStatusChange(so.id, e.target.value)} disabled={statusUpdatingId === so.id} style={{ padding: "4px 8px", borderRadius: "8px", fontSize: "11px", fontWeight: 700, border: "1px solid " + (STATUS_COLORS[so.status] || "#6B7280"), backgroundColor: (STATUS_COLORS[so.status] || "#6B7280") + "22", color: STATUS_COLORS[so.status] || "#6B7280" }}>
-                      {["draft", "confirmed", "in_progress", "completed", "cancelled"].map(s => <option key={s} value={s}>{s.replace("_", " ").toUpperCase()}</option>)}
+                    <select value={so.status} onChange={e => handleStatusChange(so.id, e.target.value)} disabled={statusUpdatingId === so.id} title="In Progress / Completed are set automatically from Delivery Note dispatches" style={{ padding: "4px 8px", borderRadius: "8px", fontSize: "11px", fontWeight: 700, border: "1px solid " + (STATUS_COLORS[so.status] || "#6B7280"), backgroundColor: (STATUS_COLORS[so.status] || "#6B7280") + "22", color: STATUS_COLORS[so.status] || "#6B7280" }}>
+                      {["draft", "confirmed", "in_progress", "completed", "cancelled"].map(s => <option key={s} value={s} disabled={s === "in_progress" || s === "completed"}>{s.replace("_", " ").toUpperCase()}</option>)}
                     </select>
                   </td>
                   <td style={{ padding: "12px" }}>
                     <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                       <button onClick={() => openEdit(so)} style={{ padding: "5px 10px", backgroundColor: "transparent", color: "var(--accent)", border: "1px solid var(--accent)", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>Edit</button>
-                      {["confirmed", "in_progress"].includes(so.status) && <button onClick={() => openFulfill(so)} style={{ padding: "5px 10px", backgroundColor: "#F59E0B", color: "white", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>Fulfill</button>}
                       {!so.invoiced && ["confirmed", "in_progress", "completed"].includes(so.status) && <button onClick={() => createInvoice(so)} style={{ padding: "5px 10px", backgroundColor: "#10B981", color: "white", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>Create Invoice</button>}
                       {so.invoiced && <span style={{ fontSize: "11px", color: "#10B981", fontWeight: 600, padding: "5px 4px" }}>Invoiced</span>}
                       <button onClick={() => handleDelete(so.id)} style={{ padding: "5px 10px", backgroundColor: "transparent", color: "#EF4444", border: "none", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>Delete</button>
@@ -399,27 +373,6 @@ export default function SalesOrdersPage() {
               ))}
             </tbody>
           </table>
-        </div>
-      )}
-
-      {fulfillingId && (
-        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9998 }}>
-          <div style={{ ...cardStyle, width: "480px", maxWidth: "90vw" }}>
-            <h3 style={{ fontSize: "16px", fontWeight: 700, color: "var(--ink)", margin: "0 0 16px 0" }}>Update Fulfillment</h3>
-            <p style={{ fontSize: "13px", color: "var(--muted)", marginBottom: "16px" }}>Enter quantities delivered/fulfilled to the customer.</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
-              {Object.keys(deliverQtys).map(itemId => (
-                <div key={itemId} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ flex: 1, fontSize: "13px", color: "var(--ink)" }}>Item</span>
-                  <input type="number" min="0" value={deliverQtys[itemId]} onChange={e => setDeliverQtys({ ...deliverQtys, [itemId]: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, width: "100px" }} />
-                </div>
-              ))}
-            </div>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button onClick={() => { const so = orders.find(o => o.id === fulfillingId); if (so) confirmFulfill(so); }} disabled={fulfillSaving} style={{ flex: 1, padding: "11px", backgroundColor: "#10B981", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", opacity: fulfillSaving ? 0.6 : 1 }}>{fulfillSaving ? "Updating..." : "Confirm Fulfillment"}</button>
-              <button onClick={() => setFulfillingId(null)} style={{ padding: "11px 20px", backgroundColor: "transparent", color: "var(--muted)", border: "1px solid var(--line)", borderRadius: "8px", cursor: "pointer" }}>Cancel</button>
-            </div>
-          </div>
         </div>
       )}
     </div>
