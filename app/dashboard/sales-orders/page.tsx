@@ -28,6 +28,7 @@ export default function SalesOrdersPage() {
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
   const [fulfillingId, setFulfillingId] = useState<string | null>(null);
   const [deliverQtys, setDeliverQtys] = useState<Record<string, number>>({});
+  const [fulfillSaving, setFulfillSaving] = useState(false);
 
   const [fromQuotationId, setFromQuotationId] = useState("");
   const [customerName, setCustomerName] = useState("");
@@ -177,9 +178,11 @@ export default function SalesOrdersPage() {
   }
 
   async function confirmFulfill(so: SalesOrder) {
+    if (fulfillSaving) return;
+    setFulfillSaving(true);
     const supabase = createClient();
     const { data: soItems } = await supabase.from("sales_order_items").select("*").eq("sales_order_id", so.id);
-    if (!soItems) return;
+    if (!soItems) { setFulfillSaving(false); return; }
 
     let allDelivered = true;
     for (const item of soItems) {
@@ -191,6 +194,7 @@ export default function SalesOrdersPage() {
 
     await supabase.from("sales_orders").update({ status: allDelivered ? "completed" : "in_progress" }).eq("id", so.id);
     setFulfillingId(null);
+    setFulfillSaving(false);
     showToast("Fulfillment updated!", true);
     fetchAll();
   }
@@ -349,7 +353,7 @@ export default function SalesOrdersPage() {
               ))}
             </div>
             <div style={{ display: "flex", gap: "10px" }}>
-              <button onClick={() => { const so = orders.find(o => o.id === fulfillingId); if (so) confirmFulfill(so); }} style={{ flex: 1, padding: "11px", backgroundColor: "#10B981", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer" }}>Confirm Fulfillment</button>
+              <button onClick={() => { const so = orders.find(o => o.id === fulfillingId); if (so) confirmFulfill(so); }} disabled={fulfillSaving} style={{ flex: 1, padding: "11px", backgroundColor: "#10B981", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", opacity: fulfillSaving ? 0.6 : 1 }}>{fulfillSaving ? "Updating..." : "Confirm Fulfillment"}</button>
               <button onClick={() => setFulfillingId(null)} style={{ padding: "11px 20px", backgroundColor: "transparent", color: "var(--muted)", border: "1px solid var(--line)", borderRadius: "8px", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>

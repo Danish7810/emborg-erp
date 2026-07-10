@@ -22,6 +22,7 @@ export default function PurchaseOrdersPage() {
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
   const [receivingId, setReceivingId] = useState<string | null>(null);
   const [receiveQtys, setReceiveQtys] = useState<Record<string, number>>({});
+  const [receiveSaving, setReceiveSaving] = useState(false);
 
   const [supplierId, setSupplierId] = useState("");
   const [orderDate, setOrderDate] = useState("");
@@ -137,9 +138,11 @@ export default function PurchaseOrdersPage() {
   }
 
   async function confirmReceive(po: PO) {
+    if (receiveSaving) return;
+    setReceiveSaving(true);
     const supabase = createClient();
     const { data: poItems } = await supabase.from("purchase_order_items").select("*").eq("purchase_order_id", po.id);
-    if (!poItems) return;
+    if (!poItems) { setReceiveSaving(false); return; }
 
     const { data: { user } } = await supabase.auth.getUser();
     const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", user!.id).single();
@@ -172,6 +175,7 @@ export default function PurchaseOrdersPage() {
 
     await supabase.from("purchase_orders").update({ status: allReceived ? "received" : "partially_received" }).eq("id", po.id);
     setReceivingId(null);
+    setReceiveSaving(false);
     showToast("Stock received and inventory updated!", true);
     fetchAll();
   }
@@ -299,7 +303,7 @@ export default function PurchaseOrdersPage() {
               ))}
             </div>
             <div style={{ display: "flex", gap: "10px" }}>
-              <button onClick={() => { const po = orders.find(o => o.id === receivingId); if (po) confirmReceive(po); }} style={{ flex: 1, padding: "11px", backgroundColor: "#10B981", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer" }}>Confirm Receipt</button>
+              <button onClick={() => { const po = orders.find(o => o.id === receivingId); if (po) confirmReceive(po); }} disabled={receiveSaving} style={{ flex: 1, padding: "11px", backgroundColor: "#10B981", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: "pointer", opacity: receiveSaving ? 0.6 : 1 }}>{receiveSaving ? "Receiving..." : "Confirm Receipt"}</button>
               <button onClick={() => setReceivingId(null)} style={{ padding: "11px 20px", backgroundColor: "transparent", color: "var(--muted)", border: "1px solid var(--line)", borderRadius: "8px", cursor: "pointer" }}>Cancel</button>
             </div>
           </div>

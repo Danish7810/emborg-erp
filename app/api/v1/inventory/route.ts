@@ -11,8 +11,7 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 200);
   const offset = parseInt(url.searchParams.get("offset") || "0");
   const lowStock = url.searchParams.get("low_stock") === "true";
-  let query = db.from("inventory").select("*", { count: "exact" }).eq("company_id", ctx.companyId).order("name").range(offset, offset + limit - 1);
-  if (lowStock) query = query.lte("quantity", db.rpc as never);
+  const query = db.from("inventory").select("*", { count: "exact" }).eq("company_id", ctx.companyId).order("name").range(offset, offset + limit - 1);
   const { data, error, count } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   const result = lowStock ? (data || []).filter((i: { quantity: number; low_stock_alert: number }) => i.quantity <= i.low_stock_alert) : data;
