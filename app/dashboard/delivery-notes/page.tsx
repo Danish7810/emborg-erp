@@ -156,7 +156,7 @@ export default function DeliveryNotesPage() {
       if (item.qty > currentQty) {
         showToast("Warning: dispatching " + item.qty + " but only " + currentQty + " in stock for " + item.item_name, false);
       }
-      const { error: rpcError } = await supabase.rpc("record_stock_movement", {
+      const { data: rpcData, error: rpcError } = await supabase.rpc("record_stock_movement", {
         p_inventory_id: item.inventory_id,
         p_delta: -item.qty,
         p_entry_type: "sale",
@@ -169,6 +169,19 @@ export default function DeliveryNotesPage() {
       });
       if (rpcError) {
         showToast("Failed to record stock for " + item.item_name + ": " + rpcError.message, false);
+        continue;
+      }
+
+      // Consume only what was actually deducted (may be less than
+      // item.qty if the RPC had to clamp to available stock), against
+      // the reservation this delivery note's own sales order is holding.
+      if (dn.sales_order_id) {
+        const appliedDelta = Math.abs(rpcData?.[0]?.applied_delta ?? item.qty);
+        await supabase.rpc("consume_reservation", {
+          p_sales_order_id: dn.sales_order_id,
+          p_inventory_id: item.inventory_id,
+          p_qty: appliedDelta,
+        });
       }
     }
 
@@ -179,14 +192,36 @@ export default function DeliveryNotesPage() {
   }
 
   async function handleStatusChange(id: string, newStatus: string) {
+    const dn = notes.find(n => n.id === id);
+    if (!dn) return;
+
     // "dispatched" carries a stock-deduction side effect that must go through handleDispatch's
     // logic (and its over-request warning) rather than a raw status write, or inventory silently
     // desyncs from what the document claims happened.
-    if (newStatus === "dispatched") {
-      const dn = notes.find(n => n.id === id);
-      if (dn && dn.status === "draft") { handleDispatch(dn); return; }
-    }
+    if (newStatus === "dispatched" && dn.status === "draft") { handleDispatch(dn); return; }
+
     const supabase = createClient();
+
+    // Restore the reservation this delivery note's sales order was
+    // holding, for whatever was actually consumed at dispatch time --
+    // restore_reservation() naturally bounds this to what's really
+    // outstanding, so passing the nominal line qty here is safe even if
+    // less than that was actually dispatched. This restores the
+    // reservation bookkeeping only; it does not reverse the physical
+    // inventory/stock_ledger_entries movement from the dispatch.
+    if (dn.status === "dispatched" && (newStatus === "returned" || newStatus === "cancelled") && dn.sales_order_id) {
+      const { data: dnItems } = await supabase.from("delivery_note_items").select("*").eq("delivery_note_id", id);
+      for (const item of dnItems || []) {
+        if (item.inventory_id) {
+          await supabase.rpc("restore_reservation", {
+            p_sales_order_id: dn.sales_order_id,
+            p_inventory_id: item.inventory_id,
+            p_qty: item.qty,
+          });
+        }
+      }
+    }
+
     await supabase.from("delivery_notes").update({ status: newStatus }).eq("id", id);
     fetchAll();
   }
