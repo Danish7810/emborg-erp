@@ -26,6 +26,7 @@ export default function DeliveryNotesPage() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
 
+  const [dispatchingId, setDispatchingId] = useState<string | null>(null);
   const [fromSOId, setFromSOId] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
@@ -136,12 +137,14 @@ export default function DeliveryNotesPage() {
   }
 
   async function handleDispatch(dn: DeliveryNote) {
+    if (dispatchingId) return;
     if (!confirm("Dispatch " + dn.number + "? This will deduct stock from Inventory.")) return;
+    setDispatchingId(dn.id);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", user!.id).single();
     const { data: dnItems } = await supabase.from("delivery_note_items").select("*").eq("delivery_note_id", dn.id);
-    if (!dnItems) return;
+    if (!dnItems) { setDispatchingId(null); return; }
 
     for (const item of dnItems) {
       if (!item.inventory_id) continue;
@@ -150,21 +153,32 @@ export default function DeliveryNotesPage() {
       if (item.qty > currentQty) {
         showToast("Warning: dispatching " + item.qty + " but only " + currentQty + " in stock for " + item.item_name, false);
       }
-      const newBalance = Math.max(0, currentQty - item.qty);
+      // Deduct only what's actually available; the ledger must record the real delta so
+      // balance_after stays reconciled with qty_change even when a dispatch is over-requested.
+      const deductQty = Math.min(item.qty, currentQty);
+      const newBalance = currentQty - deductQty;
       await supabase.from("inventory").update({ quantity: newBalance }).eq("id", item.inventory_id);
       await supabase.from("stock_ledger_entries").insert({
         company_id: profile?.company_id, inventory_id: item.inventory_id, item_name: item.item_name,
-        entry_type: "sale", qty_change: -item.qty, balance_after: newBalance,
+        entry_type: "sale", qty_change: -deductQty, balance_after: newBalance,
         reference_type: "delivery_note", reference_id: dn.id, notes: "Dispatched via " + dn.number,
       });
     }
 
     await supabase.from("delivery_notes").update({ status: "dispatched" }).eq("id", dn.id);
+    setDispatchingId(null);
     showToast("Dispatched! Stock updated.", true);
     fetchAll();
   }
 
   async function handleStatusChange(id: string, newStatus: string) {
+    // "dispatched" carries a stock-deduction side effect that must go through handleDispatch's
+    // logic (and its over-request warning) rather than a raw status write, or inventory silently
+    // desyncs from what the document claims happened.
+    if (newStatus === "dispatched") {
+      const dn = notes.find(n => n.id === id);
+      if (dn && dn.status === "draft") { handleDispatch(dn); return; }
+    }
     const supabase = createClient();
     await supabase.from("delivery_notes").update({ status: newStatus }).eq("id", id);
     fetchAll();
@@ -278,14 +292,14 @@ export default function DeliveryNotesPage() {
                   <td style={{ padding: "12px", color: "var(--muted)" }}>{dn.delivery_date ? new Date(dn.delivery_date).toLocaleDateString() : "-"}</td>
                   <td style={{ padding: "12px", color: "var(--muted)" }}>{dn.vehicle_number || "-"}</td>
                   <td style={{ padding: "12px" }}>
-                    <select value={dn.status} onChange={e => handleStatusChange(dn.id, e.target.value)} style={{ padding: "4px 8px", borderRadius: "8px", fontSize: "11px", fontWeight: 700, border: "1px solid " + (STATUS_COLORS[dn.status] || "#6B7280"), backgroundColor: (STATUS_COLORS[dn.status] || "#6B7280") + "22", color: STATUS_COLORS[dn.status] || "#6B7280" }}>
+                    <select value={dn.status} onChange={e => handleStatusChange(dn.id, e.target.value)} disabled={dispatchingId === dn.id} style={{ padding: "4px 8px", borderRadius: "8px", fontSize: "11px", fontWeight: 700, border: "1px solid " + (STATUS_COLORS[dn.status] || "#6B7280"), backgroundColor: (STATUS_COLORS[dn.status] || "#6B7280") + "22", color: STATUS_COLORS[dn.status] || "#6B7280" }}>
                       {["draft", "dispatched", "delivered", "returned", "cancelled"].map(s => <option key={s} value={s}>{s.toUpperCase()}</option>)}
                     </select>
                   </td>
                   <td style={{ padding: "12px" }}>
                     <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                       <button onClick={() => openEdit(dn)} style={{ padding: "5px 10px", backgroundColor: "transparent", color: "var(--accent)", border: "1px solid var(--accent)", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>Edit</button>
-                      {dn.status === "draft" && <button onClick={() => handleDispatch(dn)} style={{ padding: "5px 10px", backgroundColor: "#F59E0B", color: "white", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>Dispatch</button>}
+                      {dn.status === "draft" && <button onClick={() => handleDispatch(dn)} disabled={dispatchingId === dn.id} style={{ padding: "5px 10px", backgroundColor: "#F59E0B", color: "white", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "pointer", opacity: dispatchingId === dn.id ? 0.6 : 1 }}>{dispatchingId === dn.id ? "Dispatching..." : "Dispatch"}</button>}
                       <button onClick={() => printSlip(dn)} style={{ padding: "5px 10px", backgroundColor: "#6366F1", color: "white", border: "none", borderRadius: "6px", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>Print Slip</button>
                       <button onClick={() => handleDelete(dn.id)} style={{ padding: "5px 10px", backgroundColor: "transparent", color: "#EF4444", border: "none", fontSize: "11px", fontWeight: 600, cursor: "pointer" }}>Delete</button>
                     </div>
