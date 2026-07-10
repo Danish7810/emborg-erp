@@ -3,13 +3,16 @@ import { Resend } from "resend";
 import { requireUser } from "../../lib/apiAuth";
 import { renderEmborgEmail } from "../../lib/emailTemplate";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: NextRequest) {
   try {
     const auth = await requireUser();
     if (auth instanceof NextResponse) return auth;
     const { supabase } = auth;
+
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
+    }
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { leaveRequestId } = await req.json();
     if (!leaveRequestId) return NextResponse.json({ error: "Missing leaveRequestId" }, { status: 400 });

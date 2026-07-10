@@ -4,7 +4,6 @@ import { Resend } from "resend";
 import { requireUser } from "../../lib/apiAuth";
 import { renderEmborgEmail } from "../../lib/emailTemplate";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const serviceClient = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_KEY!
@@ -15,6 +14,11 @@ export async function POST(req: NextRequest) {
     const auth = await requireUser();
     if (auth instanceof NextResponse) return auth;
     const { user, supabase } = auth;
+
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
+    }
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { itemId } = await req.json();
     if (!itemId) return NextResponse.json({ error: "Missing itemId" }, { status: 400 });
