@@ -148,21 +148,28 @@ export default function DeliveryNotesPage() {
 
     for (const item of dnItems) {
       if (!item.inventory_id) continue;
+      // Advisory read only, for the warning message below -- the actual
+      // deduction happens atomically inside the RPC, which independently
+      // (and race-safely) determines how much is really available.
       const { data: invItem } = await supabase.from("inventory").select("quantity").eq("id", item.inventory_id).single();
       const currentQty = invItem?.quantity || 0;
       if (item.qty > currentQty) {
         showToast("Warning: dispatching " + item.qty + " but only " + currentQty + " in stock for " + item.item_name, false);
       }
-      // Deduct only what's actually available; the ledger must record the real delta so
-      // balance_after stays reconciled with qty_change even when a dispatch is over-requested.
-      const deductQty = Math.min(item.qty, currentQty);
-      const newBalance = currentQty - deductQty;
-      await supabase.from("inventory").update({ quantity: newBalance }).eq("id", item.inventory_id);
-      await supabase.from("stock_ledger_entries").insert({
-        company_id: profile?.company_id, inventory_id: item.inventory_id, item_name: item.item_name,
-        entry_type: "sale", qty_change: -deductQty, balance_after: newBalance,
-        reference_type: "delivery_note", reference_id: dn.id, notes: "Dispatched via " + dn.number,
+      const { error: rpcError } = await supabase.rpc("record_stock_movement", {
+        p_inventory_id: item.inventory_id,
+        p_delta: -item.qty,
+        p_entry_type: "sale",
+        p_item_name: item.item_name,
+        p_company_id: profile?.company_id,
+        p_reference_type: "delivery_note",
+        p_reference_id: dn.id,
+        p_notes: "Dispatched via " + dn.number,
+        p_clamp_to_available: true,
       });
+      if (rpcError) {
+        showToast("Failed to record stock for " + item.item_name + ": " + rpcError.message, false);
+      }
     }
 
     await supabase.from("delivery_notes").update({ status: "dispatched" }).eq("id", dn.id);
