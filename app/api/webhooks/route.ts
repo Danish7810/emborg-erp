@@ -3,11 +3,6 @@ import { requireUser } from "../../lib/apiAuth";
 import { createClient } from "@supabase/supabase-js";
 import { randomBytes } from "crypto";
 
-const serviceClient = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
-
 const VALID_EVENTS = [
   "contact.created", "lead.won", "lead.lost", "lead.created",
   "invoice.created", "invoice.paid", "invoice.overdue",
@@ -42,6 +37,14 @@ export async function POST(req: NextRequest) {
 
   const invalidEvents = events.filter((e: string) => !VALID_EVENTS.includes(e));
   if (invalidEvents.length > 0) return NextResponse.json({ error: "Invalid events: " + invalidEvents.join(", ") }, { status: 400 });
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+  }
+  const serviceClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  );
 
   const { data: companyId } = await supabase.rpc("get_my_company_id");
   const secret = randomBytes(32).toString("hex");

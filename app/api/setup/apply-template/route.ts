@@ -3,15 +3,18 @@ import { requireUser } from "../../../lib/apiAuth";
 import { createClient } from "@supabase/supabase-js";
 import { INDUSTRY_TEMPLATES } from "../../../lib/industryTemplates";
 
-const serviceClient = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
-
 export async function POST(req: NextRequest) {
   const auth = await requireUser();
   if (auth instanceof NextResponse) return auth;
   const { supabase } = auth;
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+  }
+  const serviceClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  );
 
   const { templateId, includeSampleData } = await req.json();
   const template = INDUSTRY_TEMPLATES.find(t => t.id === templateId);
