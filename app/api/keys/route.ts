@@ -3,11 +3,6 @@ import { requireUser } from "../../lib/apiAuth";
 import { createClient } from "@supabase/supabase-js";
 import { createHash, randomBytes } from "crypto";
 
-const serviceClient = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
-
 const VALID_PERMISSIONS = [
   "read:crm", "write:crm",
   "read:finance", "write:finance",
@@ -45,6 +40,14 @@ export async function POST(req: NextRequest) {
   if (invalidPerms.length > 0) {
     return NextResponse.json({ error: "Invalid permissions: " + invalidPerms.join(", ") }, { status: 400 });
   }
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+  }
+  const serviceClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  );
 
   const { data: companyId } = await supabase.rpc("get_my_company_id");
 

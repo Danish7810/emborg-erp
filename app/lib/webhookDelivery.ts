@@ -1,16 +1,24 @@
 import { createClient } from "@supabase/supabase-js";
 import { createHmac } from "crypto";
 
-const serviceClient = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
+function getServiceClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  );
+}
 
 export async function fireWebhook(
   companyId: string,
   event: string,
   payload: Record<string, unknown>
 ): Promise<void> {
+  // Webhook delivery is already treated as non-critical/best-effort by every
+  // caller (fire-and-forget) -- if the service isn't configured, silently
+  // skip rather than throwing, same spirit as the configured-check elsewhere.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) return;
+  const serviceClient = getServiceClient();
+
   // Get all active webhook endpoints for this company that listen to this event
   const { data: endpoints } = await serviceClient
     .from("webhook_endpoints")

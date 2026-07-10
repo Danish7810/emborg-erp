@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { renderEmborgEmail } from "../../../lib/emailTemplate";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
-
 // ── Fetch all data for one company over the last 30 days ──────────
-async function fetchCompanyData(companyId: string) {
+async function fetchCompanyData(companyId: string, supabase: SupabaseClient) {
   const since = new Date();
   since.setDate(since.getDate() - 30);
   const sinceStr = since.toISOString();
@@ -167,7 +162,14 @@ export async function GET(req: NextRequest) {
   if (!process.env.RESEND_API_KEY) {
     return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
   }
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+  }
   const resend = new Resend(process.env.RESEND_API_KEY);
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  );
 
   // Get all companies with at least one admin profile that has an email
   const { data: companies, error: companyErr } = await supabase
@@ -195,7 +197,7 @@ export async function GET(req: NextRequest) {
       if (!admins || admins.length === 0 || !admins[0].email) continue;
 
       const admin = admins[0];
-      const data = await fetchCompanyData(company.id);
+      const data = await fetchCompanyData(company.id, supabase);
       const summaryHtml = await generateSummary(data, company.name || "your business");
 
       const now = new Date();

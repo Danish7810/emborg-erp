@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { resolveApiKey } from "../../../lib/apiKeyAuth";
 import { createClient } from "@supabase/supabase-js";
 
-const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
-
 export async function GET(req: NextRequest) {
   const ctx = await resolveApiKey(req.headers.get("authorization"), "read:finance");
   if (ctx instanceof NextResponse) return ctx;
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+  }
+  const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
   const url = new URL(req.url);
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 200);
   const offset = parseInt(url.searchParams.get("offset") || "0");
