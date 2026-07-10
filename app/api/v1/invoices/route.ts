@@ -3,11 +3,17 @@ import { resolveApiKey } from "../../../lib/apiKeyAuth";
 import { createClient } from "@supabase/supabase-js";
 import { fireWebhook } from "../../../lib/webhookDelivery";
 
-const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
+function getDb() {
+  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
+}
 
 export async function GET(req: NextRequest) {
   const ctx = await resolveApiKey(req.headers.get("authorization"), "read:finance");
   if (ctx instanceof NextResponse) return ctx;
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+  }
+  const db = getDb();
   const url = new URL(req.url);
   const limit = Math.min(parseInt(url.searchParams.get("limit") || "50"), 200);
   const offset = parseInt(url.searchParams.get("offset") || "0");
@@ -22,6 +28,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const ctx = await resolveApiKey(req.headers.get("authorization"), "write:finance");
   if (ctx instanceof NextResponse) return ctx;
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+  }
+  const db = getDb();
   const body = await req.json();
   if (!body.client_name || !body.amount) return NextResponse.json({ error: "client_name and amount are required" }, { status: 400 });
   const invoiceNumber = "INV-" + Date.now().toString().slice(-6);

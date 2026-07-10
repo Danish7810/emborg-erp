@@ -3,13 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { requireUser } from "../../lib/apiAuth";
 
-// Service-role client — bypasses RLS. Only used AFTER we've verified
-// the caller is a logged-in member of the company they're inviting into.
-const serviceClient = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
-
 export async function POST(req: NextRequest) {
   try {
     // ── 1. Require a logged-in user ──────────────────────────────
@@ -20,7 +13,16 @@ export async function POST(req: NextRequest) {
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
     }
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+      return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+    }
     const resend = new Resend(process.env.RESEND_API_KEY);
+    // Service-role client — bypasses RLS. Only used AFTER we've verified
+    // the caller is a logged-in member of the company they're inviting into.
+    const serviceClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_KEY!
+    );
 
     const { email, role, companyId, companyName, inviterName } = await req.json();
 

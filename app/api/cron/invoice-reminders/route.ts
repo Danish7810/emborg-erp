@@ -3,13 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 import { renderEmborgEmail } from "../../../lib/emailTemplate";
 
-// Service-role client — this route has no logged-in user (it's a cron job),
-// so it must use the service key and scope everything manually by company_id.
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
-
 function daysBetween(a: Date, b: Date) {
   const ms = 1000 * 60 * 60 * 24;
   return Math.round((a.getTime() - b.getTime()) / ms);
@@ -25,7 +18,16 @@ export async function GET(req: NextRequest) {
   if (!process.env.RESEND_API_KEY) {
     return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
   }
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
+    return NextResponse.json({ error: "Database not configured" }, { status: 500 });
+  }
   const resend = new Resend(process.env.RESEND_API_KEY);
+  // Service-role client — this route has no logged-in user (it's a cron job),
+  // so it must use the service key and scope everything manually by company_id.
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!
+  );
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
