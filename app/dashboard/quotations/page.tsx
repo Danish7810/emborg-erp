@@ -147,8 +147,8 @@ export default function QuotationsPage() {
 
     const invNumber = q.number.replace("QTN", "INV");
     const { error } = await supabase.from("invoices").insert({
-      number: invNumber, client: q.customer_name, amount: q.total,
-      status: "pending", due_date: q.valid_till || null, company_id: profile.company_id,
+      invoice_number: invNumber, client_name: q.customer_name, amount: q.total,
+      status: "sent", due_date: q.valid_till || null, company_id: profile.company_id,
     });
     if (error) { showToast("Failed to create invoice: " + error.message, false); return; }
     await supabase.from("quotations").update({ status: "converted" }).eq("id", q.id);

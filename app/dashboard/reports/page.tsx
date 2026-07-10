@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "../../lib/supabase";
 
-type Invoice = { id: string; number: string; client: string; amount: number; status: string; due_date: string; created_at: string; };
+type Invoice = { id: string; invoice_number: string; client_name: string; amount: number; status: string; due_date: string; created_at: string; };
 type Expense = { id: string; description: string; amount: number; category: string; date: string; created_at: string; };
 
 export default function ReportsPage() {
@@ -28,7 +28,7 @@ export default function ReportsPage() {
     if (type === "invoices") {
       const headers = ["Invoice #", "Client", "Amount (INR)", "Status", "Due Date", "Created"];
       const rows = invoices.map(i => [
-        i.number, i.client, i.amount, i.status,
+        i.invoice_number, i.client_name, i.amount, i.status,
         i.due_date ? new Date(i.due_date).toLocaleDateString() : "",
         new Date(i.created_at).toLocaleDateString()
       ]);
@@ -56,7 +56,7 @@ export default function ReportsPage() {
     const due = inv.due_date ? new Date(inv.due_date).toLocaleDateString() : "N/A";
     const created = new Date(inv.created_at).toLocaleDateString();
     const statusColor = inv.status === "paid" ? "#10B981" : inv.status === "overdue" ? "#EF4444" : "#F59E0B";
-    win.document.write(`<!DOCTYPE html><html><head><title>Invoice ${inv.number}</title>
+    win.document.write(`<!DOCTYPE html><html><head><title>Invoice ${inv.invoice_number}</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a2e; padding: 48px; background: white; }
@@ -82,11 +82,11 @@ export default function ReportsPage() {
     </style></head><body>
     <div class="header">
       <div class="logo">EM<span>BORG</span></div>
-      <div class="invoice-title"><h1>INVOICE</h1><p># ${inv.number}</p></div>
+      <div class="invoice-title"><h1>INVOICE</h1><p># ${inv.invoice_number}</p></div>
     </div>
     <div class="divider"></div>
     <div class="meta">
-      <div class="meta-block"><h3>Bill To</h3><p>${inv.client}</p></div>
+      <div class="meta-block"><h3>Bill To</h3><p>${inv.client_name}</p></div>
       <div class="meta-block"><h3>Status</h3><span class="status">${inv.status.toUpperCase()}</span></div>
       <div class="meta-block"><h3>Invoice Date</h3><p>${created}</p></div>
       <div class="meta-block"><h3>Due Date</h3><p>${due}</p></div>
@@ -94,7 +94,7 @@ export default function ReportsPage() {
     <table>
       <thead><tr><th>Description</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead>
       <tbody>
-        <tr><td>Services - ${inv.client}</td><td>1</td><td>INR ${(inv.amount || 0).toLocaleString()}</td><td>INR ${(inv.amount || 0).toLocaleString()}</td></tr>
+        <tr><td>Services - ${inv.client_name}</td><td>1</td><td>INR ${(inv.amount || 0).toLocaleString()}</td><td>INR ${(inv.amount || 0).toLocaleString()}</td></tr>
       </tbody>
       <tfoot>
         <tr><td colspan="2"></td><td style="padding:16px;font-size:13px;font-weight:600;color:#888;">Subtotal</td><td style="padding:16px;font-size:14px;">INR ${(inv.amount || 0).toLocaleString()}</td></tr>
@@ -208,8 +208,8 @@ export default function ReportsPage() {
                     <span style={{ fontSize: "12px", fontWeight: 700, color: "#6366F1" }}>PDF</span>
                   </div>
                   <div>
-                    <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--ink)", margin: 0 }}>Invoice #{inv.number}</p>
-                    <p style={{ fontSize: "12px", color: "var(--muted)", margin: 0 }}>{inv.client} - INR {(inv.amount || 0).toLocaleString()}</p>
+                    <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--ink)", margin: 0 }}>Invoice #{inv.invoice_number}</p>
+                    <p style={{ fontSize: "12px", color: "var(--muted)", margin: 0 }}>{inv.client_name} - INR {(inv.amount || 0).toLocaleString()}</p>
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>

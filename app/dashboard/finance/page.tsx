@@ -76,18 +76,55 @@ export default function FinancePage() {
     setSendingId(null);
   }
 
-  function handlePayNow(invoice: Invoice) {
+  async function handlePayNow(invoice: Invoice) {
+    let order: { orderId: string; amount: number; currency: string; keyId: string; error?: string };
+    try {
+      const orderRes = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ invoiceId: invoice.id }),
+      });
+      order = await orderRes.json();
+      if (!orderRes.ok) { showToast(order.error || "Could not start payment", false); return; }
+    } catch {
+      showToast("Could not start payment. Please try again.", false);
+      return;
+    }
+
     const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount: Math.round(invoice.amount * 100),
-      currency: "INR",
+      key: order.keyId,
+      amount: order.amount,
+      currency: order.currency,
+      order_id: order.orderId,
       name: "EMBORG",
       description: "Invoice " + invoice.invoice_number + " - " + invoice.client_name,
       image: "/brand/logo.svg",
+      // Never trust this callback directly — it only tells us Razorpay's
+      // checkout UI reported success. The actual invoice status update
+      // happens server-side in /api/razorpay/verify-payment, which
+      // recomputes and checks Razorpay's cryptographic signature before
+      // touching the database.
       handler: async function(response: any) {
-        const supabase = createClient();
-        await supabase.from("invoices").update({ status: "paid" }).eq("id", invoice.id);
-        showToast("Payment successful! ID: " + response.razorpay_payment_id, true);
+        try {
+          const verifyRes = await fetch("/api/razorpay/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              invoiceId: invoice.id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+          const result = await verifyRes.json();
+          if (verifyRes.ok && result.success) {
+            showToast("Payment successful! ID: " + response.razorpay_payment_id, true);
+          } else {
+            showToast(result.error || "Payment could not be verified. Contact support if you were charged.", false);
+          }
+        } catch {
+          showToast("Payment could not be verified. Contact support if you were charged.", false);
+        }
         fetchData();
       },
       prefill: { name: invoice.client_name },
@@ -104,7 +141,7 @@ export default function FinancePage() {
     if (!user) { setSaving(false); return; }
     const { data: profile } = await supabase.from("profiles").select("company_id").eq("id", user.id).single();
     if (!profile?.company_id) { setSaving(false); return; }
-    await supabase.from("invoices").insert({ number: invNumber, client: invClient, amount: parseFloat(invAmount) || 0, status: invStatus, due_date: invDue || null, client_email: invEmail || null, company_id: profile.company_id });
+    await supabase.from("invoices").insert({ invoice_number: invNumber, client_name: invClient, amount: parseFloat(invAmount) || 0, status: invStatus, due_date: invDue || null, client_email: invEmail || null, company_id: profile.company_id });
     setShowForm(false); setSaving(false);
     setInvNumber(""); setInvClient(""); setInvAmount(""); setInvStatus("pending"); setInvDue(""); setInvEmail("");
     fetchData();
