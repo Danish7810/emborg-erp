@@ -157,20 +157,30 @@ export default function PurchaseOrdersPage() {
       }
       if (receiveNow <= 0) { if ((item.received_qty || 0) < item.qty) allReceived = false; continue; }
 
+      // Record the atomic stock movement before marking the line received,
+      // so a failed movement never leaves received_qty out of sync with
+      // what actually happened to inventory.
+      if (item.inventory_id) {
+        const { error: rpcError } = await supabase.rpc("record_stock_movement", {
+          p_inventory_id: item.inventory_id,
+          p_delta: receiveNow,
+          p_entry_type: "purchase_receipt",
+          p_item_name: item.item_name,
+          p_company_id: profile?.company_id,
+          p_reference_type: "purchase_order",
+          p_reference_id: po.id,
+          p_notes: "Received against " + po.number,
+        });
+        if (rpcError) {
+          showToast("Failed to record stock for " + item.item_name + ": " + rpcError.message, false);
+          allReceived = false;
+          continue;
+        }
+      }
+
       const newReceivedQty = (item.received_qty || 0) + receiveNow;
       await supabase.from("purchase_order_items").update({ received_qty: newReceivedQty }).eq("id", item.id);
       if (newReceivedQty < item.qty) allReceived = false;
-
-      if (item.inventory_id) {
-        const { data: invItem } = await supabase.from("inventory").select("quantity").eq("id", item.inventory_id).single();
-        const newBalance = (invItem?.quantity || 0) + receiveNow;
-        await supabase.from("inventory").update({ quantity: newBalance }).eq("id", item.inventory_id);
-        await supabase.from("stock_ledger_entries").insert({
-          company_id: profile?.company_id, inventory_id: item.inventory_id, item_name: item.item_name,
-          entry_type: "purchase_receipt", qty_change: receiveNow, balance_after: newBalance,
-          reference_type: "purchase_order", reference_id: po.id, notes: "Received against " + po.number,
-        });
-      }
     }
 
     await supabase.from("purchase_orders").update({ status: allReceived ? "received" : "partially_received" }).eq("id", po.id);

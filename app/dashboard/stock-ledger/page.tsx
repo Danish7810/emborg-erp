@@ -62,16 +62,28 @@ export default function StockLedgerPage() {
 
     const qtyNum = parseFloat(adjQty);
     const change = adjDirection === "in" ? qtyNum : -qtyNum;
-    const newBalance = item.quantity + change;
 
-    if (newBalance < 0) { showToast("Cannot reduce stock below zero.", false); setSaving(false); return; }
+    // Fast client-side pre-check for instant feedback in the common case;
+    // the RPC below is the authoritative, race-safe enforcement of this
+    // same rule (a concurrent change between this check and the RPC call
+    // is still caught there, not just here).
+    if (item.quantity + change < 0) { showToast("Cannot reduce stock below zero.", false); setSaving(false); return; }
 
-    await supabase.from("inventory").update({ quantity: newBalance }).eq("id", adjInventoryId);
-    await supabase.from("stock_ledger_entries").insert({
-      company_id: profile.company_id, inventory_id: adjInventoryId, item_name: item.name,
-      entry_type: adjDirection === "in" ? "adjustment_in" : "adjustment_out",
-      qty_change: change, balance_after: newBalance, reference_type: "manual", notes: adjNotes || null,
+    const { error: rpcError } = await supabase.rpc("record_stock_movement", {
+      p_inventory_id: adjInventoryId,
+      p_delta: change,
+      p_entry_type: adjDirection === "in" ? "adjustment_in" : "adjustment_out",
+      p_item_name: item.name,
+      p_company_id: profile.company_id,
+      p_reference_type: "manual",
+      p_notes: adjNotes || null,
     });
+
+    if (rpcError) {
+      showToast(rpcError.message.includes("Insufficient stock") ? "Cannot reduce stock below zero." : "Failed to record adjustment: " + rpcError.message, false);
+      setSaving(false);
+      return;
+    }
 
     setShowForm(false); setSaving(false); setAdjInventoryId(""); setAdjQty(""); setAdjNotes(""); setAdjDirection("in");
     showToast("Stock adjustment recorded", true);
